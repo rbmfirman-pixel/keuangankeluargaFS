@@ -6,116 +6,983 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <title>FamilyWealth</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { darkMode: 'class' }</script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
+  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;600;700&display=swap');
-    body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; -webkit-overflow-scrolling: touch; }
+    body { 
+        font-family: 'Plus Jakarta Sans', sans-serif; 
+        -webkit-tap-highlight-color: transparent; 
+        -webkit-overflow-scrolling: touch;
+    }
+    
     .card { background: white; border-radius: 20px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05); border: 1px solid #f1f5f9; transition: all 0.3s ease; }
     .dark .card { background: #1e293b; border-color: #334155; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.2); }
-    input, select { height: 52px !important; padding: 0 16px !important; width: 100%; border-radius: 16px; border: 1px solid #e2e8f0; outline: none; font-size: 16px !important; background-color: white; transition: all 0.2s; touch-action: manipulation; }
+    
+    input, select { 
+        height: 52px !important; 
+        padding: 0 16px !important; 
+        width: 100%; 
+        border-radius: 16px; 
+        border: 1px solid #e2e8f0; 
+        outline: none; 
+        font-size: 16px !important; 
+        background-color: white; 
+        transition: all 0.2s; 
+        touch-action: manipulation;
+    }
     .dark input, .dark select { background-color: #334155; border-color: #475569; color: #f8fafc; }
+    
     .fade-in { animation: fadeIn 0.4s ease-in; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
     button, a { border-radius: 16px; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+    
     .loader-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.3s; }
     .dark .loader-overlay { background: rgba(15,23,42,0.95); }
+    
     .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #4f46e5; border-radius: 50%; animation: spin 1s linear infinite; }
     .dark .spinner { border-color: #334155; border-top-color: #818cf8; }
+    
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     ::-webkit-scrollbar { width: 0px; background: transparent; }
-    /* (STYLE MINT GLASSMORPHISM tetap sama seperti file Anda, silakan sambung bagian CSS sesuai file asli) */
+
+    /* ==========================================================================
+       UPGRADE TAMPILAN: MINT GLASSMORPHISM (SUPPORT LIGHT & DARK MODE)
+       ========================================================================== */
+    
+    /* ---- MINT: LIGHT MODE (Terang) ---- */
+    html.mint body {
+        background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 50%, #81e6d9 100%) !important;
+        color: #1a202c !important;
+    }
+    html.mint body::before {
+        content: ""; position: fixed; top: -10%; left: -20%; width: 400px; height: 400px;
+        background: radial-gradient(circle, rgba(79,209,197,0.4) 0%, rgba(255,255,255,0) 70%);
+        filter: blur(50px); z-index: -1; pointer-events: none;
+    }
+    html.mint body::after {
+        content: ""; position: fixed; bottom: -10%; right: -20%; width: 400px; height: 400px;
+        background: radial-gradient(circle, rgba(49,151,149,0.3) 0%, rgba(255,255,255,0) 70%);
+        filter: blur(50px); z-index: -1; pointer-events: none;
+    }
+    html.mint header { background: transparent !important; }
+    html.mint .card {
+        background: rgba(255, 255, 255, 0.45) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.6) !important;
+        box-shadow: 0 8px 32px 0 rgba(49, 151, 149, 0.08) !important;
+    }
+    html.mint input, html.mint select {
+        background: rgba(255, 255, 255, 0.5) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.6) !important;
+        color: #1a202c !important;
+    }
+    html.mint input::placeholder { color: #4a5568 !important; }
+    html.mint .bg-indigo-600 {
+        background: linear-gradient(135deg, #319795 0%, #2c7a7b 100%) !important;
+        box-shadow: 0 12px 24px -6px rgba(44, 122, 123, 0.35) !important;
+    }
+    html.mint .text-indigo-200 { color: #e6fffa !important; }
+    html.mint .text-indigo-600 { color: #2c7a7b !important; }
+    html.mint #bottom-nav {
+        background: rgba(255, 255, 255, 0.5) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.4) !important;
+    }
+    html.mint .text-slate-800, html.mint .text-slate-700, html.mint .text-slate-600, html.mint #header-title { color: #234e52 !important; }
+    html.mint .text-slate-500, html.mint .text-slate-400 { color: #4a5568 !important; }
+    html.mint .bg-indigo-50 { background: rgba(230, 255, 250, 0.5) !important; border-color: rgba(178, 245, 234, 0.6) !important; }
+    html.mint .text-indigo-900 { color: #234e52 !important; }
+    html.mint button[type="submit"] { background: linear-gradient(135deg, #319795 0%, #2c7a7b 100%) !important; }
+    html.mint #btn-reload { background: rgba(255, 255, 255, 0.5) !important; border-color: rgba(255, 255, 255, 0.6) !important; color: #2c7a7b !important; }
+    html.mint #settings-modal-box {
+        background: rgba(255, 255, 255, 0.75) !important;
+        backdrop-filter: blur(24px) !important;
+        -webkit-backdrop-filter: blur(24px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    }
+    html.mint #settings-modal-box .bg-slate-50\/50 { background: rgba(255, 255, 255, 0.3) !important; }
+    html.mint #settings-modal-box .bg-slate-100 { background: rgba(0, 0, 0, 0.05) !important; }
+    html.mint .loader-overlay { background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%) !important; }
+    html.mint .spinner { border-color: rgba(255,255,255,0.5); border-top-color: #319795; }
+
+    /* ---- MINT: DARK MODE (Gelap) ---- */
+    html.mint.dark body {
+        background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%) !important;
+        color: #f8fafc !important;
+    }
+    html.mint.dark body::before { background: radial-gradient(circle, rgba(20,184,166,0.15) 0%, rgba(255,255,255,0) 70%); }
+    html.mint.dark body::after { background: radial-gradient(circle, rgba(13,148,136,0.15) 0%, rgba(255,255,255,0) 70%); }
+    html.mint.dark .card {
+        background: rgba(30, 41, 59, 0.45) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+    }
+    html.mint.dark input, html.mint.dark select {
+        background: rgba(15, 23, 42, 0.5) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: #ccfbf1 !important;
+    }
+    html.mint.dark input::placeholder { color: #5eead4 !important; opacity: 0.6; }
+    html.mint.dark .bg-indigo-600, html.mint.dark .dark\:bg-indigo-500, html.mint.dark button[type="submit"] {
+        background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%) !important;
+        box-shadow: 0 12px 24px -6px rgba(13, 148, 136, 0.35) !important;
+    }
+    html.mint.dark .text-indigo-200, html.mint.dark .dark\:text-indigo-100 { color: #99f6e4 !important; }
+    html.mint.dark .text-indigo-600, html.mint.dark .dark\:text-indigo-400 { color: #2dd4bf !important; }
+    html.mint.dark #bottom-nav {
+        background: rgba(15, 23, 42, 0.65) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+    html.mint.dark .text-slate-800, html.mint.dark .text-slate-700, html.mint.dark .text-slate-600, 
+    html.mint.dark .dark\:text-slate-100, html.mint.dark .dark\:text-slate-200, html.mint.dark #header-title { 
+        color: #ccfbf1 !important; 
+    }
+    html.mint.dark .text-slate-500, html.mint.dark .text-slate-400,
+    html.mint.dark .dark\:text-slate-400, html.mint.dark .dark\:text-slate-500 { 
+        color: #5eead4 !important; 
+    }
+    html.mint.dark .bg-indigo-50, html.mint.dark .dark\:bg-indigo-900\/30 { 
+        background: rgba(13, 148, 136, 0.15) !important; 
+        border-color: rgba(20, 184, 166, 0.2) !important; 
+    }
+    html.mint.dark .text-indigo-900, html.mint.dark .dark\:text-indigo-300 { color: #99f6e4 !important; }
+    html.mint.dark #btn-reload { 
+        background: rgba(30, 41, 59, 0.6) !important; 
+        border-color: rgba(255, 255, 255, 0.1) !important; 
+        color: #2dd4bf !important; 
+    }
+    html.mint.dark #settings-modal-box {
+        background: rgba(15, 23, 42, 0.75) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    html.mint.dark #settings-modal-box .bg-slate-50\/50, html.mint.dark #settings-modal-box .dark\:bg-slate-800\/50 { 
+        background: rgba(0, 0, 0, 0.3) !important; 
+    }
+    html.mint.dark #settings-modal-box .bg-slate-100, html.mint.dark #settings-modal-box .dark\:bg-slate-900 { 
+        background: rgba(0, 0, 0, 0.4) !important; 
+    }
+    html.mint.dark .loader-overlay { background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%) !important; }
+    html.mint.dark .spinner { border-color: rgba(255,255,255,0.1); border-top-color: #2dd4bf; }
   </style>
 </head>
 <body class="min-h-screen text-slate-800 dark:text-slate-100 bg-[#f8fafc] dark:bg-slate-900 pb-24 transition-colors duration-300">
+
+  <div id="loader" class="loader-overlay">
+    <div class="spinner mb-4"></div>
+    <p class="font-bold text-slate-500 dark:text-slate-400 select-none">Memuat Data...</p>
+  </div>
+
+  <div id="login-section" class="fixed inset-0 flex items-center justify-center p-4 z-50 bg-slate-50 dark:bg-slate-900 hidden transition-colors duration-300">
+    <div class="w-full max-w-sm bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700">
+      <h1 class="text-2xl font-bold text-center mb-8 text-slate-800 dark:text-slate-100 select-none">FamilyWealth</h1>
+      <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+        <input type="text" id="username" placeholder="Username" required>
+        <div class="relative">
+          <input type="password" id="password" placeholder="Password" required>
+          <span onclick="togglePassword()" class="absolute right-5 top-4 cursor-pointer text-slate-400 select-none text-xl flex items-center justify-center h-full pb-4 w-10" id="eye-icon">👁️</span>
+        </div>
+        <button type="submit" class="w-full h-[56px] bg-indigo-600 dark:bg-indigo-500 text-white font-bold hover:bg-indigo-700 transition active:scale-95">Masuk</button>
+      </form>
+    </div>
+  </div>
+
   <div id="app-section" class="hidden max-w-lg mx-auto fade-in">
-    <main id="view-home" class="px-6 space-y-6"> </main>
-    <main id="view-riwayat" class="hidden px-6 space-y-4 fade-in"> </main>
-    <main id="view-laporan" class="hidden px-6 space-y-6 fade-in"> </main>
-    
-    <main id="view-input" class="hidden px-6 space-y-6 fade-in">
-        <h2 class="text-xl font-bold dark:text-white" id="form-title">Input Transaksi</h2>
-        <form id="transaksi-form" class="space-y-4">
-            <select id="in-pencatat" class="dark:bg-slate-700" required>
-                <option value="Suami">Suami</option><option value="Istri">Istri</option><option value="Admin">Admin</option>
-            </select>
-            <select id="in-jenis" class="dark:bg-slate-700" required>
-                <option value="Pemasukan">Pemasukan</option><option value="Pengeluaran">Pengeluaran</option>
-            </select>
-            <input type="date" id="in-tgl" required>
-            <select id="in-kategori" class="dark:bg-slate-700" required><option value="">Pilih Kategori</option></select>
-            <input type="text" id="in-keterangan" placeholder="Keterangan">
-            <input type="text" id="in-nominal" placeholder="Nominal (Rp)" required onkeyup="formatRupiah(this)">
-            <button type="button" onclick="confirmSubmit()" class="w-full h-14 bg-emerald-500 text-white font-bold">Simpan Transaksi</button>
-        </form>
+    <header class="p-6 flex justify-between items-center bg-[#f8fafc] dark:bg-slate-900 sticky top-0 z-30 select-none transition-colors duration-300">
+      <h2 id="header-title" class="font-bold text-xl text-slate-800 dark:text-slate-100">Dashboard</h2>
+      <button onclick="toggleSettings()" class="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm rounded-full active:scale-95 transition-transform text-slate-600 dark:text-slate-300">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+      </button>
+    </header>
+
+    <main id="view-home" class="px-6 space-y-6">
+      <div class="grid grid-cols-2 gap-4">
+        <select id="filter-pencatat" onchange="renderFilteredData(); refreshActiveTab();" class="cursor-pointer">
+          <option value="all">Semua Orang</option>
+          <option value="Suami">Suami</option>
+          <option value="Istri">Istri</option>
+        </select>
+        <select id="filter-bulan" onchange="renderFilteredData()" class="cursor-pointer">
+          <option value="all">Semua Bulan</option>
+          <option value="0">Jan</option><option value="1">Feb</option><option value="2">Mar</option>
+          <option value="3">Apr</option><option value="4">Mei</option><option value="5">Jun</option>
+          <option value="6">Jul</option><option value="7">Ags</option><option value="8">Sep</option>
+          <option value="9">Okt</option><option value="10">Nov</option><option value="11">Des</option>
+        </select>
+      </div>
+
+      <div class="bg-indigo-600 dark:bg-indigo-500 text-white p-7 rounded-3xl shadow-lg shadow-indigo-200 dark:shadow-none select-none transition-colors">
+        <p class="text-indigo-200 dark:text-indigo-100 text-[11px] uppercase tracking-widest font-bold">Total Sisa Saldo</p>
+        <h1 id="txt-saldo" class="text-3xl font-bold mt-1">Rp 0</h1>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 select-none">
+        <div class="card p-5">
+          <p class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Saldo Awal</p>
+          <p id="txt-saldo-awal" class="text-sm font-bold mt-1 text-slate-700 dark:text-slate-200">Rp 0</p>
+        </div>
+        <div class="card p-5">
+          <p class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Pengeluaran</p>
+          <p id="txt-pengeluaran" class="text-sm font-bold mt-1 text-rose-500 dark:text-rose-400">Rp 0</p>
+        </div>
+      </div>
+
+      <div class="card p-5 h-72"><canvas id="canvasTrenSaldo"></canvas></div>
+
+      <div class="card p-6 mb-4">
+        <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 mb-4 select-none">Transaksi Terbaru</h3>
+        <div id="list-riwayat-singkat" class="space-y-2"></div>
+      </div>
+    </main>
+
+    <main id="view-riwayat" class="hidden px-6 space-y-4 fade-in">
+      <div class="relative">
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-base select-none z-10 flex items-center justify-center">🔍</span>
+        <input type="text" id="search-riwayat" placeholder="Cari kategori atau keterangan..." oninput="renderRiwayatLengkap()" class="bg-white border-none shadow-sm" style="padding-left: 44px !important;">
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <select id="filter-riwayat-bulan" onchange="renderRiwayatLengkap()" class="border-none shadow-sm cursor-pointer">
+          <option value="all">Semua Bulan</option>
+          <option value="0">Januari</option><option value="1">Februari</option><option value="2">Maret</option>
+          <option value="3">April</option><option value="4">Mei</option><option value="5">Juni</option>
+          <option value="6">Juli</option><option value="7">Agustus</option><option value="8">September</option>
+          <option value="9">Oktober</option><option value="10">November</option><option value="11">Desember</option>
+        </select>
+        <select id="filter-riwayat-tahun" onchange="renderRiwayatLengkap()" class="border-none shadow-sm cursor-pointer"><option value="all">Semua Tahun</option></select>
+      </div>
+
+      <select id="filter-riwayat-kategori" onchange="renderRiwayatLengkap()" class="border-none shadow-sm w-full cursor-pointer">
+        <option value="all">Semua Kategori</option>
+      </select>
+
+      <div id="list-riwayat-lengkap" class="space-y-3 pb-6"></div>
+    </main>
+
+    <main id="view-laporan" class="hidden px-6 space-y-6 fade-in">
+      <div class="grid grid-cols-2 gap-4">
+        <select id="filter-laporan-bulan" onchange="renderLaporanKeuangan()" class="border-none shadow-sm cursor-pointer">
+          <option value="all">Semua Bulan</option>
+          <option value="0">Januari</option><option value="1">Februari</option><option value="2">Maret</option>
+          <option value="3">April</option><option value="4">Mei</option><option value="5">Juni</option>
+          <option value="6">Juli</option><option value="7">Agustus</option><option value="8">September</option>
+          <option value="9">Oktober</option><option value="10">November</option><option value="11">Desember</option>
+        </select>
+        <select id="filter-laporan-tahun" onchange="renderLaporanKeuangan()" class="border-none shadow-sm cursor-pointer"><option value="all">Semua Tahun</option></select>
+      </div>
+
+      <div class="card p-6 select-none">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Total Pemasukan</p>
+            <p id="rep-total-masuk" class="text-xl font-bold text-emerald-500 dark:text-emerald-400 mt-1">Rp 0</p>
+          </div>
+          <div>
+            <p class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Total Pengeluaran</p>
+            <p id="rep-total-keluar" class="text-xl font-bold text-rose-500 dark:text-rose-400 mt-1">Rp 0</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card p-5">
+        <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 mb-4 select-none">Distribusi Pengeluaran Kategori</h3>
+        <div class="h-64 relative flex items-center justify-center">
+          <canvas id="canvasDistribusiKategori"></canvas>
+          <p id="no-data-doughnut" class="hidden text-sm text-slate-400 text-center select-none">Tidak ada transaksi pengeluaran pada periode ini.</p>
+        </div>
+      </div>
+
+      <div id="admin-comparison-section" class="card p-5 hidden">
+        <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 mb-4 select-none">Komparasi Finansial Pencatat</h3>
+        <div class="h-52">
+          <canvas id="canvasKomparasiPasangan"></canvas>
+        </div>
+      </div>
+
+      <div class="card p-5">
+        <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 mb-4 select-none">Tren Bulanan Arus Kas</h3>
+        <div class="h-64">
+          <canvas id="canvasTrenBulanan"></canvas>
+        </div>
+      </div>
     </main>
   </div>
-  
-  <nav id="bottom-nav" class="fixed bottom-0 w-full ...">
-    <div class="flex justify-around items-center">
-      <button onclick="switchTab('home')">Home</button>
-      <button onclick="switchTab('riwayat')">Riwayat</button>
-      <button onclick="openInputMode()" class="bg-emerald-500 text-white p-4 -mt-8 rounded-full shadow-lg">+</button>
-      <button onclick="switchTab('laporan')">Laporan</button>
+
+  <div id="settings-modal" class="opacity-0 pointer-events-none fixed inset-0 z-50 bg-slate-800/40 backdrop-blur-sm p-6 overflow-y-auto flex items-center justify-center transition-opacity duration-300">
+    <div id="settings-modal-box" class="w-full max-w-sm bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden transform scale-95 translate-y-4 transition-all duration-300">
+      <div class="p-6 border-b border-slate-50 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
+        <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Pengaturan</h2>
+        <button onclick="toggleSettings()" class="w-8 h-8 flex items-center justify-center bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300 rounded-full font-bold active:scale-95 transition-transform text-sm">✕</button>
+      </div>
+      
+      <div class="p-6 space-y-4">
+        <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-2xl border border-indigo-100 dark:border-indigo-800 flex items-center gap-4 transition-colors">
+          <div class="w-12 h-12 bg-white dark:bg-indigo-800 text-indigo-600 dark:text-indigo-300 rounded-full flex items-center justify-center text-xl font-bold shadow-sm">
+            👤
+          </div>
+          <div>
+            <p class="text-[10px] uppercase text-indigo-400 font-bold tracking-wider">Akun Aktif</p>
+            <p id="txt-user-display" class="font-bold text-indigo-900 dark:text-indigo-100 capitalize text-lg">-</p>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm transition-colors">
+          
+          <p class="text-[10px] uppercase text-slate-400 font-bold mb-3 tracking-wider">Mode Tampilan</p>
+          <div class="grid grid-cols-3 gap-1 bg-slate-100 dark:bg-slate-900 p-1 rounded-xl relative mb-4">
+            <button onclick="setTheme('light')" id="btn-theme-light" class="py-2 text-[11px] font-bold rounded-lg transition-all text-slate-500">Terang</button>
+            <button onclick="setTheme('dark')" id="btn-theme-dark" class="py-2 text-[11px] font-bold rounded-lg transition-all text-slate-500">Gelap</button>
+            <button onclick="setTheme('auto')" id="btn-theme-auto" class="py-2 text-[11px] font-bold rounded-lg transition-all text-slate-500">Auto</button>
+          </div>
+
+          <p class="text-[10px] uppercase text-slate-400 font-bold mb-3 tracking-wider">Gaya Visual</p>
+          <div class="grid grid-cols-2 gap-1 bg-slate-100 dark:bg-slate-900 p-1 rounded-xl relative">
+            <button onclick="setStyle('default')" id="btn-style-default" class="py-2 text-[11px] font-bold rounded-lg transition-all text-slate-500">Bawaan</button>
+            <button onclick="setStyle('mint')" id="btn-style-mint" class="py-2 text-[11px] font-bold rounded-lg transition-all text-slate-500">Mint Glass</button>
+          </div>
+
+        </div>
+
+        <button onclick="clearCache()" class="w-full flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 active:bg-slate-50 dark:active:bg-slate-700 transition-colors shadow-sm">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">🧹</span>
+            <span class="font-bold text-slate-700 dark:text-slate-200 text-sm">Bersihkan Cache Data</span>
+          </div>
+          <span class="text-slate-400 dark:text-slate-500 text-xs font-bold bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-md">Refresh</span>
+        </button>
+
+        <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 p-4 rounded-2xl font-bold active:bg-rose-100 dark:active:bg-rose-900/50 transition-colors mt-8 border border-rose-100 dark:border-rose-900">
+          <span class="text-lg">🚪</span> Keluar Aplikasi
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <button onclick="loadDataFromServer(true)" id="btn-reload" class="hidden fixed bottom-24 right-6 bg-white/70 dark:bg-slate-800/80 backdrop-blur-lg border border-white/50 dark:border-slate-700/50 text-indigo-600 dark:text-indigo-400 w-14 h-14 rounded-full shadow-[0_12px_30px_rgba(79,70,229,0.25)] flex items-center justify-center z-50 active:scale-90 transition-all duration-200 select-none touch-manipulation">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+  </button>
+
+  <nav id="bottom-nav" class="hidden fixed bottom-0 w-full bg-white/80 dark:bg-slate-800/90 backdrop-blur-lg border-t border-white/50 dark:border-slate-700/50 px-6 py-3 z-40 pb-safe shadow-[0_-4px_12px_rgba(0,0,0,0.03)] select-none transition-colors duration-300">
+    <div class="max-w-lg mx-auto flex justify-around items-center">
+      <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center p-2 text-indigo-600 dark:text-indigo-400 transition active:scale-95 touch-manipulation w-20">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 mb-1"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+        <span class="text-[10px] font-bold">Home</span>
+      </button>
+      <button onclick="switchTab('riwayat')" id="nav-riwayat" class="flex flex-col items-center p-2 text-slate-400 dark:text-slate-500 transition active:scale-95 touch-manipulation w-20">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 mb-1"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+        <span class="text-[10px] font-bold">Riwayat</span>
+      </button>
+      <button onclick="switchTab('laporan')" id="nav-laporan" class="flex flex-col items-center p-2 text-slate-400 dark:text-slate-500 transition active:scale-95 touch-manipulation w-20">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 mb-1"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" /></svg>
+        <span class="text-[10px] font-bold">Laporan</span>
+      </button>
     </div>
   </nav>
-  const API_URL = "https://script.google.com/macros/s/AKfycbzQElXfKhIb5ORqq2Q71iZeOWMKil3oLLBaCOkF0-ZRRJqpRHKrhDKtXniqVpC2BJYH/exec";
 
-// Tambahkan variabel ini di atas script
-let editMode = false;
-let editRow = null;
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwzGOv26svKIlGAJg7pmzVfixFVPYtdAPjX9X8g2qYcGK8cwa0dNJTfjAUc2qNsXtQ/exec";
+    let globalTransactions = []; 
+    let chartInstance = null;
+    let chartDoughnutInstance = null;
+    let chartTrendInstance = null;
+    let chartCompareInstance = null;
+    
+    const formatter = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 });
 
-// FUNGSI BARU UNTUK INPUT/EDIT
-function openInputMode() {
-    editMode = false;
-    document.getElementById('form-title').innerText = "Input Transaksi";
-    document.getElementById('transaksi-form').reset();
-    document.getElementById('in-pencatat').value = localStorage.getItem("fw_user") || "Admin";
-    switchTab('input');
-}
+    function initTheme() {
+        const savedTheme = localStorage.getItem('fw_theme') || 'auto';
+        const savedStyle = localStorage.getItem('fw_style') || 'default';
+        
+        setStyle(savedStyle, false);
+        setTheme(savedTheme, false);
+        
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (localStorage.getItem('fw_theme') === 'auto') {
+                applyDarkClass(e.matches, true);
+            }
+        });
+    }
 
-function openEdit(item) {
-    editMode = true; editRow = item.row;
-    document.getElementById('form-title').innerText = "Edit Transaksi";
-    document.getElementById('in-pencatat').value = item.pencatat;
-    document.getElementById('in-jenis').value = item.jenis;
-    document.getElementById('in-tgl').value = new Date(item.tgl).toISOString().split('T')[0];
-    document.getElementById('in-kategori').value = item.kategori;
-    document.getElementById('in-keterangan').value = item.keterangan;
-    document.getElementById('in-nominal').value = new Intl.NumberFormat('id-ID').format(item.nominal);
-    switchTab('input');
-}
+    function setStyle(style, updateCharts = true) {
+        localStorage.setItem('fw_style', style);
+        
+        if (style === 'mint') { document.documentElement.classList.add('mint'); } 
+        else { document.documentElement.classList.remove('mint'); }
 
-function formatRupiah(input) {
-    let val = input.value.replace(/[^0-9]/g, '');
-    input.value = val ? new Intl.NumberFormat('id-ID').format(val) : '';
-}
+        ['default', 'mint'].forEach(s => {
+            const btn = document.getElementById(`btn-style-${s}`);
+            if(btn) {
+                if (s === style) {
+                    btn.classList.add('bg-white', 'dark:bg-slate-700', 'text-slate-800', 'dark:text-white', 'shadow-sm');
+                    btn.classList.remove('text-slate-500', 'dark:text-slate-400');
+                } else {
+                    btn.classList.remove('bg-white', 'dark:bg-slate-700', 'text-slate-800', 'dark:text-white', 'shadow-sm');
+                    btn.classList.add('text-slate-500', 'dark:text-slate-400');
+                }
+            }
+        });
 
-function confirmSubmit() {
-    if(confirm("Yakin ingin menyimpan?")) submitForm();
-}
+        if(updateCharts) updateChartColors();
+    }
 
-function submitForm() {
-    const payload = {
-        action: 'saveTransaction',
-        mode: editMode ? 'edit' : 'add',
-        row: editRow,
-        user: localStorage.getItem("fw_user"),
-        pencatat: document.getElementById('in-pencatat').value,
-        jenis: document.getElementById('in-jenis').value,
-        tgl: document.getElementById('in-tgl').value,
-        kategori: document.getElementById('in-kategori').value,
-        keterangan: document.getElementById('in-keterangan').value,
-        nominal: parseInt(document.getElementById('in-nominal').value.replace(/\./g, ''))
+    function setTheme(theme, updateCharts = true) {
+        localStorage.setItem('fw_theme', theme);
+        
+        let isDark = false;
+        if (theme === 'dark') { isDark = true; } 
+        else if (theme === 'light') { isDark = false; } 
+        else { isDark = window.matchMedia('(prefers-color-scheme: dark)').matches; }
+
+        applyDarkClass(isDark, false);
+
+        ['light', 'dark', 'auto'].forEach(t => {
+            const btn = document.getElementById(`btn-theme-${t}`);
+            if(btn) {
+                if (t === theme) {
+                    btn.classList.add('bg-white', 'dark:bg-slate-700', 'text-slate-800', 'dark:text-white', 'shadow-sm');
+                    btn.classList.remove('text-slate-500', 'dark:text-slate-400');
+                } else {
+                    btn.classList.remove('bg-white', 'dark:bg-slate-700', 'text-slate-800', 'dark:text-white', 'shadow-sm');
+                    btn.classList.add('text-slate-500', 'dark:text-slate-400');
+                }
+            }
+        });
+
+        if(updateCharts) updateChartColors();
+    }
+
+    function applyDarkClass(isDark, updateCharts = true) {
+        if (isDark) { document.documentElement.classList.add('dark'); } 
+        else { document.documentElement.classList.remove('dark'); }
+        if(updateCharts) updateChartColors();
+    }
+
+    function updateChartColors() {
+        const isDark = document.documentElement.classList.contains('dark');
+        const isMint = document.documentElement.classList.contains('mint');
+        
+        if (isMint) {
+            Chart.defaults.color = isDark ? '#99f6e4' : '#234e52';
+        } else {
+            Chart.defaults.color = isDark ? '#94a3b8' : '#64748b';
+        }
+
+        if(chartInstance) chartInstance.update();
+        if(chartDoughnutInstance) chartDoughnutInstance.update();
+        if(chartTrendInstance) chartTrendInstance.update();
+        if(chartCompareInstance) chartCompareInstance.update();
+    }
+
+    function togglePassword() { const p = document.getElementById("password"); const i = document.getElementById("eye-icon"); if(p.type === "password") { p.type = "text"; i.innerText = "🙈"; } else { p.type = "password"; i.innerText = "👁️"; } }
+    
+    function handleLogin(e) { 
+        e.preventDefault(); 
+        const user = document.getElementById("username").value; 
+        const pass = document.getElementById("password").value; 
+        document.getElementById("loader").classList.remove("hidden"); 
+        fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "login", username: user, password: pass }) })
+        .then(res => res.json()).then(res => { 
+            if(res.status === "success") { localStorage.setItem("fw_user", user); location.reload(); } 
+            else { document.getElementById("loader").classList.add("hidden"); alert(res.message); } 
+        }).catch(err => { 
+            console.error("Login Error:", err);
+            document.getElementById("loader").classList.add("hidden"); 
+            alert("Gagal menghubungi server."); 
+        }); 
+    }
+    
+    function handleLogout() { localStorage.clear(); location.reload(); }
+
+    function toggleSettings() {
+        const modal = document.getElementById("settings-modal");
+        const modalBox = document.getElementById("settings-modal-box");
+        const user = localStorage.getItem("fw_user") || "Guest";
+        
+        document.getElementById("txt-user-display").innerText = user;
+        
+        if (modal.classList.contains("opacity-0")) {
+            modal.classList.remove("opacity-0", "pointer-events-none");
+            modalBox.classList.remove("scale-95", "translate-y-4");
+            modalBox.classList.add("scale-100", "translate-y-0");
+        } else {
+            modal.classList.add("opacity-0", "pointer-events-none");
+            modalBox.classList.remove("scale-100", "translate-y-0");
+            modalBox.classList.add("scale-95", "translate-y-4");
+        }
+    }
+
+    function clearCache() {
+        if(confirm("Apakah Anda ingin memuat ulang semua data dari server?")) {
+            toggleSettings();
+            loadDataFromServer(true);
+        }
+    }
+
+    function switchTab(tab) {
+        const views = ['home', 'riwayat', 'laporan'];
+        const titles = { 'home': 'Dashboard', 'riwayat': 'Riwayat Transaksi', 'laporan': 'Laporan Keuangan' };
+        
+        views.forEach(v => {
+            const viewEl = document.getElementById(`view-${v}`);
+            const navEl = document.getElementById(`nav-${v}`);
+            if(v === tab) {
+                viewEl.classList.remove("hidden");
+                navEl.classList.replace("text-slate-400", "text-indigo-600");
+                navEl.classList.replace("dark:text-slate-500", "dark:text-indigo-400");
+            } else {
+                viewEl.classList.add("hidden");
+                navEl.classList.replace("text-indigo-600", "text-slate-400");
+                navEl.classList.replace("dark:text-indigo-400", "dark:text-slate-500");
+            }
+        });
+        
+        document.getElementById("header-title").innerText = titles[tab];
+        
+        if(tab === 'riwayat') renderRiwayatLengkap();
+        if(tab === 'laporan') renderLaporanKeuangan();
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function refreshActiveTab() {
+        if(!document.getElementById("view-riwayat").classList.contains("hidden")) renderRiwayatLengkap();
+        if(!document.getElementById("view-laporan").classList.contains("hidden")) renderLaporanKeuangan();
+    }
+
+    function loadDataFromServer(isReload = false) {
+      document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
+      
+      fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "getTransactions" }) })
+      .then(response => response.json())
+      .then(res => { 
+        if(res.status === "success") {
+            globalTransactions = res.data;
+            
+            // MODIFIKASI: Menyimpan urutan asli (baris pada Google Sheet) ke dalam data
+            globalTransactions.forEach((trx, index) => { trx._originalIndex = index; });
+
+            if(!isReload) {
+                const curM = new Date().getMonth().toString();
+                document.getElementById("filter-bulan").value = curM;
+                document.getElementById("filter-riwayat-bulan").value = curM;
+                document.getElementById("filter-laporan-bulan").value = curM;
+                
+                const user = localStorage.getItem("fw_user");
+                const filterPencatat = document.getElementById("filter-pencatat");
+                
+                if (user && user.toLowerCase() !== "admin") {
+                    let matchedOpt = Array.from(filterPencatat.options).find(opt => opt.value.toLowerCase() === user.toLowerCase());
+                    if(matchedOpt) { filterPencatat.value = matchedOpt.value; } 
+                    else { filterPencatat.innerHTML = `<option value="${user}">${user}</option>`; }
+                    
+                    filterPencatat.disabled = true;
+                    filterPencatat.classList.add("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
+                } else {
+                    filterPencatat.disabled = false;
+                    filterPencatat.classList.remove("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
+                }
+            }
+            initRiwayatFilters(); 
+            renderFilteredData(); 
+            refreshActiveTab();
+        } else { 
+            alert("Gagal memuat data: " + res.message); 
+        }
+        document.getElementById("loader").classList.add("opacity-0", "pointer-events-none"); 
+      }).catch(err => { 
+          console.error("Fetch Error:", err);
+          document.getElementById("loader").classList.add("opacity-0", "pointer-events-none"); 
+          alert("Gagal mengambil data dari Google Sheet. Periksa koneksi internet Anda."); 
+      });
+    }
+
+    function initRiwayatFilters() {
+        const selectTahun = document.getElementById("filter-riwayat-tahun");
+        const selectLaporanTahun = document.getElementById("filter-laporan-tahun");
+        
+        const currTahun = selectTahun.value;
+        const currLapTahun = selectLaporanTahun.value;
+        
+        selectTahun.innerHTML = '<option value="all">Semua Tahun</option>';
+        selectLaporanTahun.innerHTML = '<option value="all">Semua Tahun</option>';
+        
+        const tahunSet = new Set();
+        const selectKategori = document.getElementById("filter-riwayat-kategori");
+        const currKategori = selectKategori.value;
+        selectKategori.innerHTML = '<option value="all">Semua Kategori</option>';
+        const kategoriSet = new Set();
+
+        globalTransactions.forEach(trx => { 
+            const targetDate = trx.tgl; 
+            if(targetDate) { 
+                const year = new Date(targetDate).getFullYear(); 
+                if(year && !isNaN(year)) tahunSet.add(year); 
+            } 
+            if(trx.kategori) {
+                kategoriSet.add(trx.kategori.toString().trim());
+            }
+        });
+
+        Array.from(tahunSet).sort((a,b) => b - a).forEach(thn => { 
+            let opt1 = document.createElement("option"); opt1.value = thn; opt1.text = thn; selectTahun.appendChild(opt1); 
+            let opt2 = document.createElement("option"); opt2.value = thn; opt2.text = thn; selectLaporanTahun.appendChild(opt2); 
+        });
+        
+        const currentYear = new Date().getFullYear().toString();
+        if(currTahun && currTahun !== "all") selectTahun.value = currTahun;
+        else { if(document.querySelector(`#filter-riwayat-tahun option[value="${currentYear}"]`)) selectTahun.value = currentYear; }
+
+        if(currLapTahun && currLapTahun !== "all") selectLaporanTahun.value = currLapTahun;
+        else { if(document.querySelector(`#filter-laporan-tahun option[value="${currentYear}"]`)) selectLaporanTahun.value = currentYear; }
+
+        Array.from(kategoriSet).sort().forEach(kat => {
+            let option = document.createElement("option"); option.value = kat.toLowerCase(); option.text = kat; selectKategori.appendChild(option);
+        });
+        if(currKategori && currKategori !== "all") selectKategori.value = currKategori;
+    }
+
+    function renderRiwayatLengkap() {
+        const currentUser = (localStorage.getItem("fw_user") || "").toLowerCase();
+        const rawFilterP = document.getElementById("filter-pencatat").value.toLowerCase();
+        const filterP = (currentUser === "admin") ? rawFilterP : currentUser; 
+
+        const filterB = document.getElementById("filter-riwayat-bulan").value;
+        const filterT = document.getElementById("filter-riwayat-tahun").value;
+        const filterK = document.getElementById("filter-riwayat-kategori").value.toLowerCase(); 
+        const searchVal = document.getElementById("search-riwayat").value.toLowerCase();
+        
+        let filtered = globalTransactions.filter(trx => {
+            const targetDate = trx.tgl;
+            if(!targetDate) return false;
+            const date = new Date(targetDate);
+            if(isNaN(date)) return false;
+
+            const pencatatStr = (trx.pencatat || "").toString().toLowerCase();
+            const kategoriStr = (trx.kategori || "").toString().toLowerCase().trim();
+            const ketStr = (trx.keterangan || "").toString().toLowerCase();
+
+            const matchPencatat = (filterP === "all" || pencatatStr === filterP);
+            const matchBulan = (filterB === "all" || date.getMonth().toString() === filterB);
+            const matchTahun = (filterT === "all" || date.getFullYear().toString() === filterT);
+            const matchKategori = (filterK === "all" || kategoriStr === filterK); 
+            const matchSearch = (searchVal === "" || kategoriStr.includes(searchVal) || ketStr.includes(searchVal));
+            
+            return matchPencatat && matchBulan && matchTahun && matchKategori && matchSearch;
+        });
+        
+        // MODIFIKASI: Mengurutkan dari Tanggal terbaru. Jika tanggal sama, urutkan dari Baris (Index) Sheet terbawah
+        filtered.sort((a, b) => {
+            const dateA = new Date(a.tgl);
+            const dateB = new Date(b.tgl);
+            if (dateB.getTime() !== dateA.getTime()) {
+                return dateB - dateA;
+            }
+            return (b._originalIndex || 0) - (a._originalIndex || 0);
+        });
+
+        let html = "";
+        filtered.forEach(trx => {
+            const isPengeluaran = (trx.jenis || "").toString().toLowerCase() === 'pengeluaran';
+            const pencatatText = trx.pencatat ? trx.pencatat.toString() : '?';
+            const badgeColor = pencatatText.toLowerCase() === 'suami' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400';
+            const dateDisplay = new Date(trx.tgl).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            
+            html += `<div class="card p-4 flex flex-col gap-2 select-none transition-colors">
+                <div class="flex justify-between items-center border-b border-slate-50 dark:border-slate-700/50 pb-2"><span class="text-[10px] font-bold text-slate-400 dark:text-slate-500">📅 ${dateDisplay}</span><span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${badgeColor}">${pencatatText}</span></div>
+                <div class="flex justify-between items-center pt-1"><div class="min-w-0 pr-3 flex-1"><p class="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">${trx.kategori || "-"}</p><p class="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">${trx.keterangan || "-"}</p></div><span class="${isPengeluaran ? 'text-rose-500 dark:text-rose-400' : 'text-emerald-500 dark:text-emerald-400'} font-bold text-sm">${isPengeluaran ? '-' : '+'}${formatter.format(trx.nominal)}</span></div>
+            </div>`;
+        });
+        document.getElementById("list-riwayat-lengkap").innerHTML = html || '<div class="text-center py-10 select-none"><p class="text-sm text-slate-500 dark:text-slate-400">Tidak ada transaksi.</p></div>';
+    }
+
+    function renderFilteredData() {
+      const currentUser = (localStorage.getItem("fw_user") || "").toLowerCase();
+      const rawFilterP = document.getElementById("filter-pencatat").value.toLowerCase();
+      const filterP = (currentUser === "admin") ? rawFilterP : currentUser; 
+      
+      const filterB = document.getElementById("filter-bulan").value;
+      let saldoAwal = 0; let totalP = 0; let totalK = 0;
+      
+      globalTransactions.forEach(trx => {
+        const targetDate = trx.tgl;
+        if(!targetDate) return;
+        const d = new Date(targetDate); 
+        if(isNaN(d)) return;
+
+        const m = d.getMonth().toString(); 
+        const n = parseFloat(trx.nominal) || 0;
+        const jenis = (trx.jenis || "").toString().toLowerCase();
+        
+        if (filterP !== "all" && (trx.pencatat || "").toString().toLowerCase() !== filterP) return;
+        
+        if (filterB === "all") { 
+            if (jenis === "pemasukan") saldoAwal += n; 
+        } else { 
+            if (parseInt(m) < parseInt(filterB)) { 
+                saldoAwal += (jenis === "pemasukan" ? n : -n); 
+            } 
+        }
+        
+        if (filterB === "all" || m === filterB) { 
+            if (jenis === "pemasukan") totalP += n; else totalK += n; 
+        }
+      });
+      
+      document.getElementById("txt-saldo-awal").innerText = formatter.format(filterB === "all" ? totalP : saldoAwal);
+      document.getElementById("txt-pengeluaran").innerText = formatter.format(totalK);
+      document.getElementById("txt-saldo").innerText = formatter.format((filterB === "all" ? totalP : saldoAwal) + totalP - totalK);
+      
+      let html = "";
+      
+      // MODIFIKASI: Disesuaikan juga dengan logika pengurutan yang baru untuk widget "Transaksi Terbaru" di Home
+      globalTransactions.filter(t => {
+          const tDate = t.tgl;
+          if(!tDate || isNaN(new Date(tDate))) return false;
+          const matchP = filterP === "all" || (t.pencatat || "").toString().toLowerCase() === filterP;
+          const matchB = filterB === "all" || new Date(tDate).getMonth().toString() === filterB;
+          return matchP && matchB;
+      }).sort((a,b) => {
+          const dateA = new Date(a.tgl);
+          const dateB = new Date(b.tgl);
+          if (dateA.getTime() !== dateB.getTime()) {
+              return dateA - dateB;
+          }
+          return (a._originalIndex || 0) - (b._originalIndex || 0);
+      }).slice(-5).reverse().forEach(trx => {
+        const isPengeluaran = (trx.jenis || "").toString().toLowerCase() === 'pengeluaran';
+        html += `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-700/50 last:border-0 select-none transition-colors"><div class="min-w-0 pr-4 flex-1"><p class="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">${trx.kategori || "-"}</p><p class="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">${trx.keterangan || "-"}</p></div><span class="${isPengeluaran ? 'text-rose-500 dark:text-rose-400' : 'text-emerald-500 dark:text-emerald-400'} font-bold text-sm">${isPengeluaran ? '-' : '+'}${formatter.format(trx.nominal)}</span></div>`;
+      });
+      document.getElementById("list-riwayat-singkat").innerHTML = html || `<p class="text-sm text-slate-400 dark:text-slate-500 text-center py-4 select-none">Belum ada transaksi.</p>`;
+      renderDailyChart();
+    }
+
+    function renderDailyChart() {
+      const currentUser = (localStorage.getItem("fw_user") || "").toLowerCase();
+      const rawFilterP = document.getElementById("filter-pencatat").value.toLowerCase();
+      const filterP = (currentUser === "admin") ? rawFilterP : currentUser; 
+
+      const labels = []; const data = []; const today = new Date();
+      for(let i = 6; i >= 0; i--) {
+        const d = new Date(); d.setDate(today.getDate() - i);
+        labels.push(d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }));
+        let ds = 0;
+        globalTransactions.forEach(trx => {
+          const targetDate = trx.tgl;
+          if(!targetDate) return;
+          const tD = new Date(targetDate);
+          if(isNaN(tD)) return;
+
+          const matchPencatat = (filterP === "all" || (trx.pencatat || "").toString().toLowerCase() === filterP);
+          
+          if (tD.getDate() === d.getDate() && tD.getMonth() === d.getMonth() && tD.getFullYear() === d.getFullYear() && matchPencatat && (trx.jenis || "").toString().toLowerCase() === 'pengeluaran') {
+              ds += parseFloat(trx.nominal) || 0;
+          }
+        });
+        data.push(ds);
+      }
+      
+      if(chartInstance) chartInstance.destroy();
+      chartInstance = new Chart(document.getElementById('canvasTrenSaldo'), {
+        type: 'line',
+        data: { labels: labels, datasets: [{ label: 'Pengeluaran 7 Hari Terakhir', data: data, borderColor: '#4f46e5', backgroundColor: 'rgba(79, 70, 229, 0.1)', fill: true, tension: 0.4, pointRadius: 6, pointBackgroundColor: '#4f46e5' }] },
+        options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, elements: { point: { hitRadius: 25 } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+      });
+    }
+
+    function renderLaporanKeuangan() {
+        const currentUser = (localStorage.getItem("fw_user") || "").toLowerCase();
+        const rawFilterP = document.getElementById("filter-pencatat").value.toLowerCase();
+        const filterP = (currentUser === "admin") ? rawFilterP : currentUser; 
+        
+        const filterB = document.getElementById("filter-laporan-bulan").value;
+        const filterT = document.getElementById("filter-laporan-tahun").value;
+        
+        let totalPemasukan = 0;
+        let totalPengeluaran = 0;
+        const kategoriMap = {};
+        
+        globalTransactions.forEach(trx => {
+            const targetDate = trx.tgl;
+            if(!targetDate) return;
+            const date = new Date(targetDate);
+            if(isNaN(date)) return;
+            
+            const matchPencatat = (filterP === "all" || (trx.pencatat || "").toString().toLowerCase() === filterP);
+            const matchBulan = (filterB === "all" || date.getMonth().toString() === filterB);
+            const matchTahun = (filterT === "all" || date.getFullYear().toString() === filterT);
+            
+            if(matchPencatat && matchBulan && matchTahun) {
+                const nominal = parseFloat(trx.nominal) || 0;
+                const jenis = (trx.jenis || "").toString().toLowerCase();
+                
+                if(jenis === 'pemasukan') {
+                    totalPemasukan += nominal;
+                } else if(jenis === 'pengeluaran') {
+                    totalPengeluaran += nominal;
+                    const kat = trx.kategori ? trx.kategori.toString().trim() : "Lainnya";
+                    kategoriMap[kat] = (kategoriMap[kat] || 0) + nominal;
+                }
+            }
+        });
+        
+        document.getElementById("rep-total-masuk").innerText = formatter.format(totalPemasukan);
+        document.getElementById("rep-total-keluar").innerText = formatter.format(totalPengeluaran);
+        
+        const katLabels = Object.keys(kategoriMap);
+        const katData = Object.values(kategoriMap);
+        
+        if(chartDoughnutInstance) chartDoughnutInstance.destroy();
+        
+        if(katData.length > 0) {
+            document.getElementById("canvasDistribusiKategori").classList.remove("hidden");
+            document.getElementById("no-data-doughnut").classList.add("hidden");
+            
+            chartDoughnutInstance = new Chart(document.getElementById('canvasDistribusiKategori'), {
+                type: 'doughnut',
+                data: {
+                    labels: katLabels,
+                    datasets: [{
+                        data: katData,
+                        backgroundColor: ['#4f46e5', '#10b981', '#f43f5e', '#f59e0b', '#06b6d4', '#8b5cf6', '#ec4899', '#64748b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Plus Jakarta Sans', size: 11 } } } }
+                }
+            });
+        } else {
+            document.getElementById("canvasDistribusiKategori").classList.add("hidden");
+            document.getElementById("no-data-doughnut").classList.remove("hidden");
+        }
+        
+        const targetYear = filterT === "all" ? new Date().getFullYear().toString() : filterT;
+        const bulananIn = Array(12).fill(0);
+        const bulananOut = Array(12).fill(0);
+        
+        globalTransactions.forEach(trx => {
+            const targetDate = trx.tgl;
+            if(!targetDate) return;
+            const date = new Date(targetDate);
+            if(isNaN(date)) return;
+
+            if(date.getFullYear().toString() === targetYear) {
+                const matchPencatat = (filterP === "all" || (trx.pencatat || "").toString().toLowerCase() === filterP);
+                if(matchPencatat) {
+                    const m = date.getMonth();
+                    const n = parseFloat(trx.nominal) || 0;
+                    const jenis = (trx.jenis || "").toString().toLowerCase();
+
+                    if(jenis === 'pemasukan') bulananIn[m] += n;
+                    else if(jenis === 'pengeluaran') bulananOut[m] += n;
+                }
+            }
+        });
+        
+        const namaBulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+        if(chartTrendInstance) chartTrendInstance.destroy();
+        chartTrendInstance = new Chart(document.getElementById('canvasTrenBulanan'), {
+            type: 'bar',
+            data: {
+                labels: namaBulan,
+                datasets: [
+                    { label: 'Pemasukan', data: bulananIn, backgroundColor: 'rgba(16, 185, 129, 0.85)', borderRadius: 6 },
+                    { label: 'Pengeluaran', data: bulananOut, backgroundColor: 'rgba(244, 63, 94, 0.85)', borderRadius: 6 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 10 } } } },
+                plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'Plus Jakarta Sans', size: 11 } } } }
+            }
+        });
+        
+        const compSection = document.getElementById("admin-comparison-section");
+        if(currentUser === "admin") {
+            compSection.classList.remove("hidden");
+            
+            const pencatatMap = {}; 
+            
+            globalTransactions.forEach(trx => {
+                const targetDate = trx.tgl;
+                if(!targetDate) return;
+                const date = new Date(targetDate);
+                if(isNaN(date)) return;
+
+                const matchBulan = (filterB === "all" || date.getMonth().toString() === filterB);
+                const matchTahun = (filterT === "all" || date.getFullYear().toString() === filterT);
+                
+                if(matchBulan && matchTahun) {
+                    const pencatat = trx.pencatat ? trx.pencatat.toString().trim() : "Lainnya";
+                    const n = parseFloat(trx.nominal) || 0;
+                    const jenis = (trx.jenis || "").toString().toLowerCase();
+                    
+                    if(!pencatatMap[pencatat]) {
+                        pencatatMap[pencatat] = { in: 0, out: 0 };
+                    }
+                    
+                    if(jenis === "pemasukan") {
+                        pencatatMap[pencatat].in += n;
+                    } else if(jenis === "pengeluaran") {
+                        pencatatMap[pencatat].out += n;
+                    }
+                }
+            });
+            
+            const compLabels = Object.keys(pencatatMap);
+            const dataIn = compLabels.map(key => pencatatMap[key].in);
+            const dataOut = compLabels.map(key => pencatatMap[key].out);
+            
+            if(chartCompareInstance) chartCompareInstance.destroy();
+            chartCompareInstance = new Chart(document.getElementById('canvasKomparasiPasangan'), {
+                type: 'bar',
+                data: {
+                    labels: compLabels,
+                    datasets: [
+                        { label: 'Pemasukan', data: dataIn, backgroundColor: '#10b981', borderRadius: 6 },
+                        { label: 'Pengeluaran', data: dataOut, backgroundColor: '#f43f5e', borderRadius: 6 }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { x: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, ticks: { font: { size: 10 } } }, y: { grid: { display: false }, ticks: { font: { fontStyle: 'bold' } } } },
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
+                }
+            });
+        } else {
+            compSection.classList.add("hidden");
+        }
+    }
+
+    window.onload = () => {
+        initTheme(); 
+        if(localStorage.getItem("fw_user")) {
+            document.getElementById("login-section").classList.add("hidden");
+            document.getElementById("app-section").classList.remove("hidden");
+            document.getElementById("bottom-nav").classList.remove("hidden");
+            document.getElementById("btn-reload").classList.remove("hidden");
+            loadDataFromServer();
+        } else {
+            document.getElementById("login-section").classList.remove("hidden");
+            document.getElementById("loader").classList.add("opacity-0", "pointer-events-none");
+        }
     };
-    fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
-    .then(res => res.json()).then(data => { alert('Berhasil!'); location.reload(); });
-}
-
-// Update fungsi switchTab agar support tab 'input'
-function switchTab(tab) {
-    ['home', 'riwayat', 'laporan', 'input'].forEach(v => {
-        document.getElementById(`view-${v}`)?.classList.toggle('hidden', v !== tab);
-    });
-    // ... sisa logika tab lainnya
-}
+  </script>
+</body>
+</html>
