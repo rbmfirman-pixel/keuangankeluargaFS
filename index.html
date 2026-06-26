@@ -104,7 +104,7 @@
     html.mint .text-slate-500, html.mint .text-slate-400 { color: #4a5568 !important; }
     html.mint .bg-indigo-50 { background: rgba(230, 255, 250, 0.5) !important; border-color: rgba(178, 245, 234, 0.6) !important; }
     html.mint .text-indigo-900 { color: #234e52 !important; }
-    html.mint button[type="submit"] { background: linear-gradient(135deg, #319795 0%, #2c7a7b 100%) !important; }
+    html.mint button[type="submit"], html.mint #btn-submit-transaksi { background: linear-gradient(135deg, #319795 0%, #2c7a7b 100%) !important; }
     html.mint #btn-reload { background: rgba(255, 255, 255, 0.5) !important; border-color: rgba(255, 255, 255, 0.6) !important; color: #2c7a7b !important; }
     html.mint #settings-modal-box {
         background: rgba(255, 255, 255, 0.75) !important;
@@ -135,7 +135,7 @@
         color: #ccfbf1 !important;
     }
     html.mint.dark input::placeholder { color: #5eead4 !important; opacity: 0.6; }
-    html.mint.dark .bg-indigo-600, html.mint.dark .dark\:bg-indigo-500, html.mint.dark button[type="submit"] {
+    html.mint.dark .bg-indigo-600, html.mint.dark .dark\:bg-indigo-500, html.mint.dark button[type="submit"], html.mint.dark #btn-submit-transaksi {
         background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%) !important;
         box-shadow: 0 12px 24px -6px rgba(13, 148, 136, 0.35) !important;
     }
@@ -175,6 +175,13 @@
     }
     html.mint.dark .loader-overlay { background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%) !important; }
     html.mint.dark .spinner { border-color: rgba(255,255,255,0.1); border-top-color: #2dd4bf; }
+
+    /* Styling untuk Form Input & Edit */
+    .hidden-section { display: none !important; }
+    .btn-edit { background: #3b82f6; color: white; padding: 4px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; transition: background 0.2s; }
+    .btn-edit:hover { background: #2563eb; }
+    html.mint .btn-edit { background: #319795; }
+    html.mint.dark .btn-edit { background: #0d9488; }
   </style>
 </head>
 <body class="min-h-screen text-slate-800 dark:text-slate-100 bg-[#f8fafc] dark:bg-slate-900 pb-24 transition-colors duration-300">
@@ -317,6 +324,35 @@
         </div>
       </div>
     </main>
+
+    <main id="view-input" class="hidden px-6 space-y-4 fade-in pb-10">
+      <div class="card p-6 border-0 shadow-sm">
+        <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-6" id="form-title">Input Transaksi</h2>
+        <form id="transaksi-form" class="space-y-4">
+            <select id="in-pencatat" class="w-full" required>
+                <option value="Suami">Suami</option>
+                <option value="Istri">Istri</option>
+                <option value="Admin">Admin</option>
+            </select>
+            <select id="in-jenis" class="w-full" required>
+                <option value="Pemasukan">Pemasukan</option>
+                <option value="Pengeluaran">Pengeluaran</option>
+            </select>
+            <input type="date" id="in-tgl" class="w-full" required>
+            
+            <select id="in-kategori" class="w-full" required>
+                <option value="">Pilih Kategori</option>
+            </select>
+            
+            <input type="text" id="in-kategori-baru" placeholder="Atau ketik kategori baru di sini..." class="w-full text-sm">
+
+            <input type="text" id="in-keterangan" placeholder="Keterangan (Opsional)" class="w-full">
+            <input type="text" id="in-nominal" placeholder="Nominal (Rp)" class="w-full font-bold text-indigo-600 dark:text-indigo-400 text-lg" required onkeyup="formatRupiah(this)">
+            
+            <button type="button" id="btn-submit-transaksi" onclick="confirmSubmit()" class="w-full h-[56px] mt-4 bg-emerald-500 text-white rounded-2xl font-bold hover:opacity-90 active:scale-95 transition-all shadow-md">Simpan Transaksi</button>
+        </form>
+      </div>
+    </main>
   </div>
 
   <div id="settings-modal" class="opacity-0 pointer-events-none fixed inset-0 z-50 bg-slate-800/40 backdrop-blur-sm p-6 overflow-y-auto flex items-center justify-center transition-opacity duration-300">
@@ -373,17 +409,25 @@
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
   </button>
 
-  <nav id="bottom-nav" class="hidden fixed bottom-0 w-full bg-white/80 dark:bg-slate-800/90 backdrop-blur-lg border-t border-white/50 dark:border-slate-700/50 px-6 py-3 z-40 pb-safe shadow-[0_-4px_12px_rgba(0,0,0,0.03)] select-none transition-colors duration-300">
+  <nav id="bottom-nav" class="hidden fixed bottom-0 w-full bg-white/80 dark:bg-slate-800/90 backdrop-blur-lg border-t border-white/50 dark:border-slate-700/50 px-2 py-3 z-40 pb-safe shadow-[0_-4px_12px_rgba(0,0,0,0.03)] select-none transition-colors duration-300">
     <div class="max-w-lg mx-auto flex justify-around items-center">
-      <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center p-2 text-indigo-600 dark:text-indigo-400 transition active:scale-95 touch-manipulation w-20">
+      <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center p-2 text-indigo-600 dark:text-indigo-400 transition active:scale-95 touch-manipulation w-16">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 mb-1"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
         <span class="text-[10px] font-bold">Home</span>
       </button>
-      <button onclick="switchTab('riwayat')" id="nav-riwayat" class="flex flex-col items-center p-2 text-slate-400 dark:text-slate-500 transition active:scale-95 touch-manipulation w-20">
+      <button onclick="switchTab('riwayat')" id="nav-riwayat" class="flex flex-col items-center p-2 text-slate-400 dark:text-slate-500 transition active:scale-95 touch-manipulation w-16">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 mb-1"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
         <span class="text-[10px] font-bold">Riwayat</span>
       </button>
-      <button onclick="switchTab('laporan')" id="nav-laporan" class="flex flex-col items-center p-2 text-slate-400 dark:text-slate-500 transition active:scale-95 touch-manipulation w-20">
+      
+      <button onclick="openInputMode()" id="nav-input" class="flex flex-col items-center p-2 text-slate-400 dark:text-slate-500 transition active:scale-95 touch-manipulation w-16 relative -top-3">
+        <div class="bg-indigo-600 dark:bg-indigo-500 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg mb-1 border-4 border-[#f8fafc] dark:border-slate-900 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+        </div>
+        <span class="text-[10px] font-bold">Input</span>
+      </button>
+
+      <button onclick="switchTab('laporan')" id="nav-laporan" class="flex flex-col items-center p-2 text-slate-400 dark:text-slate-500 transition active:scale-95 touch-manipulation w-16">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 mb-1"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" /></svg>
         <span class="text-[10px] font-bold">Laporan</span>
       </button>
@@ -398,6 +442,10 @@
     let chartTrendInstance = null;
     let chartCompareInstance = null;
     
+    // --- VARIABEL UNTUK FITUR EDIT & INPUT ---
+    let editMode = false; 
+    let editRow = null;
+
     const formatter = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 });
 
     function initTheme() {
@@ -529,21 +577,27 @@
         }
     }
 
+    // ======== MODIFIKASI: Menambah tab 'input' di Navigation ========
     function switchTab(tab) {
-        const views = ['home', 'riwayat', 'laporan'];
-        const titles = { 'home': 'Dashboard', 'riwayat': 'Riwayat Transaksi', 'laporan': 'Laporan Keuangan' };
+        const views = ['home', 'riwayat', 'laporan', 'input'];
+        const titles = { 'home': 'Dashboard', 'riwayat': 'Riwayat Transaksi', 'laporan': 'Laporan Keuangan', 'input': 'Kelola Transaksi' };
         
         views.forEach(v => {
             const viewEl = document.getElementById(`view-${v}`);
             const navEl = document.getElementById(`nav-${v}`);
+            
             if(v === tab) {
                 viewEl.classList.remove("hidden");
-                navEl.classList.replace("text-slate-400", "text-indigo-600");
-                navEl.classList.replace("dark:text-slate-500", "dark:text-indigo-400");
+                if(navEl && v !== 'input') {
+                    navEl.classList.replace("text-slate-400", "text-indigo-600");
+                    navEl.classList.replace("dark:text-slate-500", "dark:text-indigo-400");
+                }
             } else {
                 viewEl.classList.add("hidden");
-                navEl.classList.replace("text-indigo-600", "text-slate-400");
-                navEl.classList.replace("dark:text-indigo-400", "dark:text-slate-500");
+                if(navEl && v !== 'input') {
+                    navEl.classList.replace("text-indigo-600", "text-slate-400");
+                    navEl.classList.replace("dark:text-indigo-400", "dark:text-slate-500");
+                }
             }
         });
         
@@ -569,7 +623,6 @@
         if(res.status === "success") {
             globalTransactions = res.data;
             
-            // MODIFIKASI: Menyimpan urutan asli (baris pada Google Sheet) ke dalam data
             globalTransactions.forEach((trx, index) => { trx._originalIndex = index; });
 
             if(!isReload) {
@@ -652,6 +705,7 @@
         if(currKategori && currKategori !== "all") selectKategori.value = currKategori;
     }
 
+    // ======== MODIFIKASI: Menambahkan tombol Edit di Render Riwayat ========
     function renderRiwayatLengkap() {
         const currentUser = (localStorage.getItem("fw_user") || "").toLowerCase();
         const rawFilterP = document.getElementById("filter-pencatat").value.toLowerCase();
@@ -681,7 +735,6 @@
             return matchPencatat && matchBulan && matchTahun && matchKategori && matchSearch;
         });
         
-        // MODIFIKASI: Mengurutkan dari Tanggal terbaru. Jika tanggal sama, urutkan dari Baris (Index) Sheet terbawah
         filtered.sort((a, b) => {
             const dateA = new Date(a.tgl);
             const dateB = new Date(b.tgl);
@@ -698,8 +751,20 @@
             const badgeColor = pencatatText.toLowerCase() === 'suami' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400';
             const dateDisplay = new Date(trx.tgl).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
             
+            // Logika kemunculan Tombol Edit
+            const canEdit = (currentUser === 'admin' || pencatatText.toLowerCase() === currentUser);
+            // Parsing aman agar tidak crash kena petik di keterangan
+            const trxSafeStr = encodeURIComponent(JSON.stringify(trx));
+            const tombolEdit = canEdit ? `<button onclick="openEdit('${trxSafeStr}')" class="btn-edit ml-2">Edit</button>` : '';
+            
             html += `<div class="card p-4 flex flex-col gap-2 select-none transition-colors">
-                <div class="flex justify-between items-center border-b border-slate-50 dark:border-slate-700/50 pb-2"><span class="text-[10px] font-bold text-slate-400 dark:text-slate-500">📅 ${dateDisplay}</span><span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${badgeColor}">${pencatatText}</span></div>
+                <div class="flex justify-between items-center border-b border-slate-50 dark:border-slate-700/50 pb-2">
+                    <div class="flex items-center">
+                        <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500">📅 ${dateDisplay}</span>
+                        ${tombolEdit}
+                    </div>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${badgeColor}">${pencatatText}</span>
+                </div>
                 <div class="flex justify-between items-center pt-1"><div class="min-w-0 pr-3 flex-1"><p class="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">${trx.kategori || "-"}</p><p class="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">${trx.keterangan || "-"}</p></div><span class="${isPengeluaran ? 'text-rose-500 dark:text-rose-400' : 'text-emerald-500 dark:text-emerald-400'} font-bold text-sm">${isPengeluaran ? '-' : '+'}${formatter.format(trx.nominal)}</span></div>
             </div>`;
         });
@@ -745,7 +810,6 @@
       
       let html = "";
       
-      // MODIFIKASI: Disesuaikan juga dengan logika pengurutan yang baru untuk widget "Transaksi Terbaru" di Home
       globalTransactions.filter(t => {
           const tDate = t.tgl;
           if(!tDate || isNaN(new Date(tDate))) return false;
@@ -970,6 +1034,152 @@
         }
     }
 
+
+    // ======== FITUR TAMBAHAN: FUNGSI INPUT & EDIT TRANSAKSI ========
+    
+    // Fungsi untuk memuat list Kategori otomatis ke select form
+    function populateKategoriForm() {
+        const selectKategori = document.getElementById("in-kategori");
+        selectKategori.innerHTML = '<option value="">Pilih Kategori</option>';
+        const kategoriSet = new Set();
+        
+        globalTransactions.forEach(trx => { 
+            if(trx.kategori) kategoriSet.add(trx.kategori.toString().trim());
+        });
+
+        Array.from(kategoriSet).sort().forEach(kat => {
+            let option = document.createElement("option"); 
+            option.value = kat; 
+            option.text = kat; 
+            selectKategori.appendChild(option);
+        });
+    }
+
+    function openInputMode() {
+        editMode = false; 
+        document.getElementById('form-title').innerText = "Input Transaksi Baru";
+        document.getElementById('transaksi-form').reset();
+        
+        populateKategoriForm();
+        
+        let activeUser = localStorage.getItem("fw_user") || "Admin";
+        // Agar pas default nama kapital di depan
+        activeUser = activeUser.charAt(0).toUpperCase() + activeUser.slice(1).toLowerCase(); 
+        
+        const pencatatForm = document.getElementById('in-pencatat');
+        if(activeUser !== "Admin") {
+            pencatatForm.value = activeUser;
+            pencatatForm.disabled = true;
+            pencatatForm.classList.add("bg-slate-100", "text-slate-500", "dark:bg-slate-800");
+        } else {
+            pencatatForm.disabled = false;
+            pencatatForm.classList.remove("bg-slate-100", "text-slate-500", "dark:bg-slate-800");
+        }
+        
+        document.getElementById('in-tgl').value = new Date().toISOString().split('T')[0]; // Default hari ini
+        
+        switchTab('input');
+    }
+
+    function openEdit(encodedItem) {
+        const item = JSON.parse(decodeURIComponent(encodedItem));
+        
+        editMode = true; 
+        editRow = item._originalIndex; // Menggunakan index asli sebagai pengenal baris
+        
+        document.getElementById('form-title').innerText = "Edit Transaksi";
+        populateKategoriForm();
+
+        const pencatatForm = document.getElementById('in-pencatat');
+        if (localStorage.getItem("fw_user").toLowerCase() !== "admin") {
+            pencatatForm.disabled = true;
+            pencatatForm.classList.add("bg-slate-100", "text-slate-500", "dark:bg-slate-800");
+        } else {
+            pencatatForm.disabled = false;
+            pencatatForm.classList.remove("bg-slate-100", "text-slate-500", "dark:bg-slate-800");
+        }
+
+        document.getElementById('in-pencatat').value = item.pencatat;
+        
+        // Penyesuaian agar Capitalize bisa cocok
+        const jenisOptions = Array.from(document.getElementById('in-jenis').options);
+        const matchJenis = jenisOptions.find(opt => opt.value.toLowerCase() === (item.jenis || "").toLowerCase());
+        if(matchJenis) document.getElementById('in-jenis').value = matchJenis.value;
+
+        // Set Date
+        if(item.tgl) document.getElementById('in-tgl').value = new Date(item.tgl).toISOString().split('T')[0];
+        
+        // Set Kategori
+        const katOptions = Array.from(document.getElementById('in-kategori').options);
+        const matchKat = katOptions.find(opt => opt.value.toLowerCase() === (item.kategori || "").toLowerCase());
+        if(matchKat) {
+            document.getElementById('in-kategori').value = matchKat.value;
+            document.getElementById('in-kategori-baru').value = "";
+        } else {
+            document.getElementById('in-kategori').value = "";
+            document.getElementById('in-kategori-baru').value = item.kategori;
+        }
+
+        document.getElementById('in-keterangan').value = item.keterangan || "";
+        document.getElementById('in-nominal').value = new Intl.NumberFormat('id-ID').format(item.nominal);
+        
+        switchTab('input');
+    }
+
+    function formatRupiah(input) {
+        let val = input.value.replace(/[^0-9]/g, '');
+        input.value = val ? new Intl.NumberFormat('id-ID').format(val) : '';
+    }
+
+    function confirmSubmit() { 
+        if(confirm("Yakin ingin menyimpan transaksi ini?")) submitForm(); 
+    }
+
+    function submitForm() {
+        // Ambil Kategori: Kalau text input baru ada isinya, pakai itu. Kalau kosong, pakai dropdown.
+        let finalKategori = document.getElementById('in-kategori-baru').value.trim();
+        if(!finalKategori) {
+            finalKategori = document.getElementById('in-kategori').value;
+        }
+
+        if(!document.getElementById('in-nominal').value || !finalKategori || !document.getElementById('in-tgl').value) {
+            alert("Harap lengkapi semua data wajib (Tanggal, Kategori, Nominal).");
+            return;
+        }
+
+        document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
+
+        const payload = {
+            action: 'saveTransaction', 
+            mode: editMode ? 'edit' : 'add', 
+            row: editRow,
+            user: localStorage.getItem("fw_user"), 
+            pencatat: document.getElementById('in-pencatat').value,
+            jenis: document.getElementById('in-jenis').value, 
+            tgl: document.getElementById('in-tgl').value,
+            kategori: finalKategori, 
+            keterangan: document.getElementById('in-keterangan').value,
+            nominal: parseInt(document.getElementById('in-nominal').value.replace(/\./g, ''))
+        };
+
+        fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+        .then(res => res.json())
+        .then(data => { 
+            alert('Transaksi berhasil disimpan!'); 
+            // Clear form
+            document.getElementById('transaksi-form').reset();
+            // Reload ke home agar merefresh data
+            loadDataFromServer(true);
+            setTimeout(() => switchTab('home'), 500); 
+        })
+        .catch(err => {
+            console.error("Error Saving:", err);
+            document.getElementById("loader").classList.add("opacity-0", "pointer-events-none");
+            alert("Terjadi kesalahan saat menyimpan data.");
+        });
+    }
+
+    // ======== INIT ========
     window.onload = () => {
         initTheme(); 
         if(localStorage.getItem("fw_user")) {
