@@ -22,25 +22,30 @@
         -webkit-overflow-scrolling: touch;
     }
     
-    .card { background: white; border-radius: 20px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05); border: 1px solid #f1f5f9; transition: all 0.3s ease; }
-    .dark .card { background: #1e293b; border-color: #334155; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.2); }
+    .card { background: white; border-radius: 24px; box-shadow: 0 4px 18px -1px rgb(0 0 0 / 0.03); border: 1px solid #f1f5f9; transition: all 0.3s ease; }
+    .dark .card { background: #1e293b; border-color: #334155; box-shadow: 0 4px 18px -1px rgb(0 0 0 / 0.2); }
     
-    input, select { 
+    input, select, textarea { 
         height: 52px !important; 
         padding: 0 16px !important; 
         width: 100%; 
         border-radius: 16px; 
         border: 1px solid #e2e8f0; 
         outline: none; 
-        font-size: 16px !important; 
+        font-size: 15px !important; 
         background-color: white; 
         transition: all 0.2s; 
         touch-action: manipulation;
     }
+    input:focus, select:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
     .dark input, .dark select { background-color: #334155; border-color: #475569; color: #f8fafc; }
+    .dark input:focus, .dark select:focus { border-color: #818cf8; box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.15); }
     
-    .fade-in { animation: fadeIn 0.4s ease-in; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeIn 0.4s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     
     button, a { border-radius: 16px; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
     
@@ -60,7 +65,7 @@
     /* ---- MINT: LIGHT MODE (Terang) ---- */
     html.mint body {
         background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 50%, #81e6d9 100%) !important;
-        color: #1a202c !important;
+        color: #234e52 !important;
     }
     html.mint body::before {
         content: ""; position: fixed; top: -10%; left: -20%; width: 400px; height: 400px;
@@ -85,7 +90,7 @@
         backdrop-filter: blur(10px) !important;
         -webkit-backdrop-filter: blur(10px) !important;
         border: 1px solid rgba(255, 255, 255, 0.6) !important;
-        color: #1a202c !important;
+        color: #234e52 !important;
     }
     html.mint input::placeholder { color: #4a5568 !important; }
     html.mint .bg-indigo-600 {
@@ -104,16 +109,8 @@
     html.mint .text-slate-500, html.mint .text-slate-400 { color: #4a5568 !important; }
     html.mint .bg-indigo-50 { background: rgba(230, 255, 250, 0.5) !important; border-color: rgba(178, 245, 234, 0.6) !important; }
     html.mint .text-indigo-900 { color: #234e52 !important; }
-    html.mint button[type="submit"], html.mint #btn-submit-transaksi { background: linear-gradient(135deg, #319795 0%, #2c7a7b 100%) !important; }
+    html.mint button[type="submit"] { background: linear-gradient(135deg, #319795 0%, #2c7a7b 100%) !important; }
     html.mint #btn-reload { background: rgba(255, 255, 255, 0.5) !important; border-color: rgba(255, 255, 255, 0.6) !important; color: #2c7a7b !important; }
-    html.mint #settings-modal-box {
-        background: rgba(255, 255, 255, 0.75) !important;
-        backdrop-filter: blur(24px) !important;
-        -webkit-backdrop-filter: blur(24px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.8) !important;
-    }
-    html.mint #settings-modal-box .bg-slate-50\/50 { background: rgba(255, 255, 255, 0.3) !important; }
-    html.mint #settings-modal-box .bg-slate-100 { background: rgba(0, 0, 0, 0.05) !important; }
     html.mint .loader-overlay { background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%) !important; }
     html.mint .spinner { border-color: rgba(255,255,255,0.5); border-top-color: #319795; }
 
@@ -135,7 +132,7 @@
         color: #ccfbf1 !important;
     }
     html.mint.dark input::placeholder { color: #5eead4 !important; opacity: 0.6; }
-    html.mint.dark .bg-indigo-600, html.mint.dark .dark\:bg-indigo-500, html.mint.dark button[type="submit"], html.mint.dark #btn-submit-transaksi {
+    html.mint.dark .bg-indigo-600, html.mint.dark .dark\:bg-indigo-500, html.mint.dark button[type="submit"] {
         background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%) !important;
         box-shadow: 0 12px 24px -6px rgba(13, 148, 136, 0.35) !important;
     }
@@ -163,30 +160,13 @@
         border-color: rgba(255, 255, 255, 0.1) !important; 
         color: #2dd4bf !important; 
     }
-    html.mint.dark #settings-modal-box {
-        background: rgba(15, 23, 42, 0.75) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    }
-    html.mint.dark #settings-modal-box .bg-slate-50\/50, html.mint.dark #settings-modal-box .dark\:bg-slate-800\/50 { 
-        background: rgba(0, 0, 0, 0.3) !important; 
-    }
-    html.mint.dark #settings-modal-box .bg-slate-100, html.mint.dark #settings-modal-box .dark\:bg-slate-900 { 
-        background: rgba(0, 0, 0, 0.4) !important; 
-    }
     html.mint.dark .loader-overlay { background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%) !important; }
     html.mint.dark .spinner { border-color: rgba(255,255,255,0.1); border-top-color: #2dd4bf; }
-
-    /* Styling untuk Form Input & Edit */
-    .hidden-section { display: none !important; }
-    .btn-edit { background: #3b82f6; color: white; padding: 4px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; transition: background 0.2s; }
-    .btn-edit:hover { background: #2563eb; }
-    html.mint .btn-edit { background: #319795; }
-    html.mint.dark .btn-edit { background: #0d9488; }
   </style>
 </head>
-<body class="min-h-screen text-slate-800 dark:text-slate-100 bg-[#f8fafc] dark:bg-slate-900 pb-24 transition-colors duration-300">
+<body class="min-h-screen text-slate-800 dark:text-slate-100 bg-[#f8fafc] dark:bg-slate-900 pb-28 transition-colors duration-300">
 
-  <div id="loader" class="loader-overlay">
+  <div id="loader" class="loader-overlay opacity-0 pointer-events-none">
     <div class="spinner mb-4"></div>
     <p class="font-bold text-slate-500 dark:text-slate-400 select-none">Memuat Data...</p>
   </div>
@@ -208,19 +188,16 @@
   <div id="app-section" class="hidden max-w-lg mx-auto fade-in">
     <header class="p-6 flex justify-between items-center bg-[#f8fafc] dark:bg-slate-900 sticky top-0 z-30 select-none transition-colors duration-300">
       <h2 id="header-title" class="font-bold text-xl text-slate-800 dark:text-slate-100">Dashboard</h2>
-      <button onclick="toggleSettings()" class="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm rounded-full active:scale-95 transition-transform text-slate-600 dark:text-slate-300">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
-      </button>
     </header>
 
     <main id="view-home" class="px-6 space-y-6">
       <div class="grid grid-cols-2 gap-4">
-        <select id="filter-pencatat" onchange="renderFilteredData(); refreshActiveTab();" class="cursor-pointer">
+        <select id="filter-pencatat" onchange="renderFilteredData(); refreshActiveTab();" class="cursor-pointer shadow-sm">
           <option value="all">Semua Orang</option>
           <option value="Suami">Suami</option>
           <option value="Istri">Istri</option>
         </select>
-        <select id="filter-bulan" onchange="renderFilteredData()" class="cursor-pointer">
+        <select id="filter-bulan" onchange="renderFilteredData()" class="cursor-pointer shadow-sm">
           <option value="all">Semua Bulan</option>
           <option value="0">Jan</option><option value="1">Feb</option><option value="2">Mar</option>
           <option value="3">Apr</option><option value="4">Mei</option><option value="5">Jun</option>
@@ -277,6 +254,68 @@
       <div id="list-riwayat-lengkap" class="space-y-3 pb-6"></div>
     </main>
 
+    <main id="view-input" class="hidden px-6 space-y-4 fade-in">
+      <div class="card p-6 space-y-5">
+        <h3 id="input-view-title" class="font-bold text-base text-slate-800 dark:text-slate-100 flex items-center gap-2 select-none">
+          <span>✍️</span> Input Transaksi
+        </h3>
+        
+        <form id="form-transaksi" onsubmit="saveTransactionForm(event)" class="space-y-5">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 select-none">Pencatat</label>
+            <div class="grid grid-cols-2 gap-3">
+              <button type="button" id="btn-pencatat-suami" onclick="setInputPencatat('Suami')" class="h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95">👨 Suami</button>
+              <button type="button" id="btn-pencatat-istri" onclick="setInputPencatat('Istri')" class="h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95">👩 Istri</button>
+            </div>
+            <input type="hidden" id="in-pencatat" required>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 select-none">Jenis Transaksi</label>
+            <div class="grid grid-cols-2 gap-3">
+              <button type="button" id="btn-jenis-masuk" onclick="setInputJenis('Pemasukan')" class="h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95">💰 Pemasukan</button>
+              <button type="button" id="btn-jenis-keluar" onclick="setInputJenis('Pengeluaran')" class="h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95">💸 Pengeluaran</button>
+            </div>
+            <input type="hidden" id="in-jenis" required>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 select-none">Tanggal</label>
+            <input type="date" id="in-tgl" required class="shadow-sm">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 select-none">Kategori</label>
+            <select id="in-kategori" required class="shadow-sm cursor-pointer">
+              <option value="" disabled selected>Pilih Kategori</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 select-none">Keterangan</label>
+            <input type="text" id="in-keterangan" placeholder="Isi catatan deskripsi singkat..." required class="shadow-sm">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 select-none">Nominal Rupiah</label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-sm select-none">Rp</span>
+              <input type="number" id="in-nominal" placeholder="0" min="1" required class="shadow-sm" style="padding-left: 42px !important;">
+            </div>
+          </div>
+
+          <div class="pt-2 space-y-2">
+            <button type="submit" class="w-full h-14 bg-indigo-600 dark:bg-indigo-500 text-white font-bold rounded-2xl shadow-md hover:bg-indigo-700 dark:hover:bg-indigo-600 transition active:scale-95 text-sm">
+              💾 Simpan Transaksi
+            </button>
+            <button type="button" id="btn-batal-edit" onclick="cancelEdit()" class="hidden w-full h-14 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-2xl transition active:scale-95 text-sm">
+              ❌ Batal Edit
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+
     <main id="view-laporan" class="hidden px-6 space-y-6 fade-in">
       <div class="grid grid-cols-2 gap-4">
         <select id="filter-laporan-bulan" onchange="renderLaporanKeuangan()" class="border-none shadow-sm cursor-pointer">
@@ -311,7 +350,7 @@
       </div>
 
       <div id="admin-comparison-section" class="card p-5 hidden">
-        <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 mb-4 select-none">Komparasi Finansial Pencatat</h3>
+        <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 mb-4 select-none">Komparasi Finansial Pasangan</h3>
         <div class="h-52">
           <canvas id="canvasKomparasiPasangan"></canvas>
         </div>
@@ -325,111 +364,79 @@
       </div>
     </main>
 
-    <main id="view-input" class="hidden px-6 space-y-4 fade-in pb-10">
-      <div class="card p-6 border-0 shadow-sm">
-        <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-6" id="form-title">Input Transaksi</h2>
-        <form id="transaksi-form" class="space-y-4">
-            <select id="in-pencatat" class="w-full" required>
-                <option value="Suami">Suami</option>
-                <option value="Istri">Istri</option>
-                <option value="Admin">Admin</option>
-            </select>
-            <select id="in-jenis" class="w-full" required>
-                <option value="Pemasukan">Pemasukan</option>
-                <option value="Pengeluaran">Pengeluaran</option>
-            </select>
-            <input type="date" id="in-tgl" class="w-full" required>
-            
-            <select id="in-kategori" class="w-full" required>
-                <option value="">Pilih Kategori</option>
-            </select>
-            
-            <input type="text" id="in-kategori-baru" placeholder="Atau ketik kategori baru di sini..." class="w-full text-sm">
-
-            <input type="text" id="in-keterangan" placeholder="Keterangan (Opsional)" class="w-full">
-            <input type="text" id="in-nominal" placeholder="Nominal (Rp)" class="w-full font-bold text-indigo-600 dark:text-indigo-400 text-lg" required onkeyup="formatRupiah(this)">
-            
-            <button type="button" id="btn-submit-transaksi" onclick="confirmSubmit()" class="w-full h-[56px] mt-4 bg-emerald-500 text-white rounded-2xl font-bold hover:opacity-90 active:scale-95 transition-all shadow-md">Simpan Transaksi</button>
-        </form>
-      </div>
-    </main>
-  </div>
-
-  <div id="settings-modal" class="opacity-0 pointer-events-none fixed inset-0 z-50 bg-slate-800/40 backdrop-blur-sm p-6 overflow-y-auto flex items-center justify-center transition-opacity duration-300">
-    <div id="settings-modal-box" class="w-full max-w-sm bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden transform scale-95 translate-y-4 transition-all duration-300">
-      <div class="p-6 border-b border-slate-50 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
-        <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Pengaturan</h2>
-        <button onclick="toggleSettings()" class="w-8 h-8 flex items-center justify-center bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300 rounded-full font-bold active:scale-95 transition-transform text-sm">✕</button>
-      </div>
-      
-      <div class="p-6 space-y-4">
+    <main id="view-settings" class="hidden px-6 space-y-4 fade-in">
+      <div class="card p-6 space-y-5">
+        <h3 class="font-bold text-base text-slate-800 dark:text-slate-100 flex items-center gap-2 select-none">⚙️ Pengaturan Aplikasi</h3>
+        
         <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-2xl border border-indigo-100 dark:border-indigo-800 flex items-center gap-4 transition-colors">
-          <div class="w-12 h-12 bg-white dark:bg-indigo-800 text-indigo-600 dark:text-indigo-300 rounded-full flex items-center justify-center text-xl font-bold shadow-sm">
-            👤
-          </div>
+          <div class="w-12 h-12 bg-white dark:bg-indigo-800 text-indigo-600 dark:text-indigo-300 rounded-full flex items-center justify-center text-xl font-bold shadow-sm select-none">👤</div>
           <div>
-            <p class="text-[10px] uppercase text-indigo-400 font-bold tracking-wider">Akun Aktif</p>
+            <p class="text-[10px] uppercase text-indigo-400 font-bold tracking-wider select-none">Akun Aktif</p>
             <p id="txt-user-display" class="font-bold text-indigo-900 dark:text-indigo-100 capitalize text-lg">-</p>
           </div>
         </div>
 
         <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm transition-colors">
-          
-          <p class="text-[10px] uppercase text-slate-400 font-bold mb-3 tracking-wider">Mode Tampilan</p>
+          <p class="text-[10px] uppercase text-slate-400 font-bold mb-3 tracking-wider select-none">Mode Tampilan</p>
           <div class="grid grid-cols-3 gap-1 bg-slate-100 dark:bg-slate-900 p-1 rounded-xl relative mb-4">
             <button onclick="setTheme('light')" id="btn-theme-light" class="py-2 text-[11px] font-bold rounded-lg transition-all text-slate-500">Terang</button>
             <button onclick="setTheme('dark')" id="btn-theme-dark" class="py-2 text-[11px] font-bold rounded-lg transition-all text-slate-500">Gelap</button>
             <button onclick="setTheme('auto')" id="btn-theme-auto" class="py-2 text-[11px] font-bold rounded-lg transition-all text-slate-500">Auto</button>
           </div>
 
-          <p class="text-[10px] uppercase text-slate-400 font-bold mb-3 tracking-wider">Gaya Visual</p>
+          <p class="text-[10px] uppercase text-slate-400 font-bold mb-3 tracking-wider select-none">Gaya Visual</p>
           <div class="grid grid-cols-2 gap-1 bg-slate-100 dark:bg-slate-900 p-1 rounded-xl relative">
             <button onclick="setStyle('default')" id="btn-style-default" class="py-2 text-[11px] font-bold rounded-lg transition-all text-slate-500">Bawaan</button>
             <button onclick="setStyle('mint')" id="btn-style-mint" class="py-2 text-[11px] font-bold rounded-lg transition-all text-slate-500">Mint Glass</button>
           </div>
-
         </div>
 
-        <button onclick="clearCache()" class="w-full flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 active:bg-slate-50 dark:active:bg-slate-700 transition-colors shadow-sm">
+        <button onclick="clearCache()" class="w-full flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 active:bg-slate-50 dark:active:bg-slate-700 transition shadow-sm">
           <div class="flex items-center gap-3">
-            <span class="text-xl">🧹</span>
+            <span class="text-xl select-none">🧹</span>
             <span class="font-bold text-slate-700 dark:text-slate-200 text-sm">Bersihkan Cache Data</span>
           </div>
           <span class="text-slate-400 dark:text-slate-500 text-xs font-bold bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-md">Refresh</span>
         </button>
 
-        <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 p-4 rounded-2xl font-bold active:bg-rose-100 dark:active:bg-rose-900/50 transition-colors mt-8 border border-rose-100 dark:border-rose-900">
-          <span class="text-lg">🚪</span> Keluar Aplikasi
+        <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 p-4 rounded-2xl font-bold active:bg-rose-100 dark:active:bg-rose-900/50 transition border border-rose-100 dark:border-rose-900 text-sm">
+          <span class="text-lg select-none">🚪</span> Keluar Aplikasi
         </button>
       </div>
-    </div>
+    </main>
   </div>
 
-  <button onclick="loadDataFromServer(true)" id="btn-reload" class="hidden fixed bottom-24 right-6 bg-white/70 dark:bg-slate-800/80 backdrop-blur-lg border border-white/50 dark:border-slate-700/50 text-indigo-600 dark:text-indigo-400 w-14 h-14 rounded-full shadow-[0_12px_30px_rgba(79,70,229,0.25)] flex items-center justify-center z-50 active:scale-90 transition-all duration-200 select-none touch-manipulation">
+  <button onclick="loadDataFromServer(true)" id="btn-reload" class="hidden fixed bottom-24 right-6 bg-white/70 dark:bg-slate-800/80 backdrop-blur-lg border border-white/50 dark:border-slate-700/50 text-indigo-600 dark:text-indigo-400 w-14 h-14 rounded-full shadow-[0_12px_30px_rgba(79,70,229,0.25)] flex items-center justify-center z-50 active:scale-90 transition duration-200 select-none touch-manipulation">
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
   </button>
 
   <nav id="bottom-nav" class="hidden fixed bottom-0 w-full bg-white/80 dark:bg-slate-800/90 backdrop-blur-lg border-t border-white/50 dark:border-slate-700/50 px-2 py-3 z-40 pb-safe shadow-[0_-4px_12px_rgba(0,0,0,0.03)] select-none transition-colors duration-300">
-    <div class="max-w-lg mx-auto flex justify-around items-center">
-      <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center p-2 text-indigo-600 dark:text-indigo-400 transition active:scale-95 touch-manipulation w-16">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 mb-1"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
-        <span class="text-[10px] font-bold">Home</span>
-      </button>
-      <button onclick="switchTab('riwayat')" id="nav-riwayat" class="flex flex-col items-center p-2 text-slate-400 dark:text-slate-500 transition active:scale-95 touch-manipulation w-16">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 mb-1"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-        <span class="text-[10px] font-bold">Riwayat</span>
+    <div class="max-w-lg mx-auto flex justify-between items-center text-center">
+      <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center p-1 text-indigo-600 dark:text-indigo-400 transition active:scale-95 flex-1">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mb-1 mx-auto"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+        <span class="text-[9px] font-bold">Home</span>
       </button>
       
-      <button onclick="openInputMode()" id="nav-input" class="flex flex-col items-center p-2 text-slate-400 dark:text-slate-500 transition active:scale-95 touch-manipulation w-16 relative -top-3">
-        <div class="bg-indigo-600 dark:bg-indigo-500 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg mb-1 border-4 border-[#f8fafc] dark:border-slate-900 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+      <button onclick="switchTab('riwayat')" id="nav-riwayat" class="flex flex-col items-center p-1 text-slate-400 dark:text-slate-500 transition active:scale-95 flex-1">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mb-1 mx-auto"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+        <span class="text-[9px] font-bold">Riwayat</span>
+      </button>
+      
+      <button onclick="switchTab('input')" id="nav-input" class="flex flex-col items-center p-1 text-slate-400 dark:text-slate-500 transition active:scale-95 flex-1">
+        <div class="w-11 h-11 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 dark:shadow-none mb-0.5 -mt-5 transform active:scale-90 transition duration-200 mx-auto">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
         </div>
-        <span class="text-[10px] font-bold">Input</span>
+        <span class="text-[9px] font-bold text-indigo-600 dark:text-indigo-400">Input</span>
       </button>
 
-      <button onclick="switchTab('laporan')" id="nav-laporan" class="flex flex-col items-center p-2 text-slate-400 dark:text-slate-500 transition active:scale-95 touch-manipulation w-16">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 mb-1"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" /></svg>
-        <span class="text-[10px] font-bold">Laporan</span>
+      <button onclick="switchTab('laporan')" id="nav-laporan" class="flex flex-col items-center p-1 text-slate-400 dark:text-slate-500 transition active:scale-95 flex-1">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mb-1 mx-auto"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" /></svg>
+        <span class="text-[9px] font-bold">Laporan</span>
+      </button>
+
+      <button onclick="switchTab('settings')" id="nav-settings" class="flex flex-col items-center p-1 text-slate-400 dark:text-slate-500 transition active:scale-95 flex-1">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mb-1 mx-auto"><path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+        <span class="text-[9px] font-bold">Setting</span>
       </button>
     </div>
   </nav>
@@ -442,10 +449,12 @@
     let chartTrendInstance = null;
     let chartCompareInstance = null;
     
-    // --- VARIABEL UNTUK FITUR EDIT & INPUT ---
-    let editMode = false; 
+    // Status Form Input & Edit Global
+    let selectedInputPencatat = "";
+    let selectedInputJenis = "";
+    let editMode = false;
     let editRow = null;
-
+    
     const formatter = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 });
 
     function initTheme() {
@@ -538,73 +547,64 @@
         e.preventDefault(); 
         const user = document.getElementById("username").value; 
         const pass = document.getElementById("password").value; 
-        document.getElementById("loader").classList.remove("hidden"); 
+        document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none"); 
         fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "login", username: user, password: pass }) })
         .then(res => res.json()).then(res => { 
             if(res.status === "success") { localStorage.setItem("fw_user", user); location.reload(); } 
-            else { document.getElementById("loader").classList.add("hidden"); alert(res.message); } 
+            else { document.getElementById("loader").classList.add("opacity-0", "pointer-events-none"); alert(res.message); } 
         }).catch(err => { 
             console.error("Login Error:", err);
-            document.getElementById("loader").classList.add("hidden"); 
+            document.getElementById("loader").classList.add("opacity-0", "pointer-events-none"); 
             alert("Gagal menghubungi server."); 
         }); 
     }
     
     function handleLogout() { localStorage.clear(); location.reload(); }
 
-    function toggleSettings() {
-        const modal = document.getElementById("settings-modal");
-        const modalBox = document.getElementById("settings-modal-box");
-        const user = localStorage.getItem("fw_user") || "Guest";
-        
-        document.getElementById("txt-user-display").innerText = user;
-        
-        if (modal.classList.contains("opacity-0")) {
-            modal.classList.remove("opacity-0", "pointer-events-none");
-            modalBox.classList.remove("scale-95", "translate-y-4");
-            modalBox.classList.add("scale-100", "translate-y-0");
-        } else {
-            modal.classList.add("opacity-0", "pointer-events-none");
-            modalBox.classList.remove("scale-100", "translate-y-0");
-            modalBox.classList.add("scale-95", "translate-y-4");
-        }
-    }
-
     function clearCache() {
         if(confirm("Apakah Anda ingin memuat ulang semua data dari server?")) {
-            toggleSettings();
             loadDataFromServer(true);
         }
     }
 
-    // ======== MODIFIKASI: Menambah tab 'input' di Navigation ========
+    // MANAJEMEN TAB AKAN MENAMPILKAN DAN MENYEMBUNYIKAN SEKSI UTAMA BERDASARKAN ID
     function switchTab(tab) {
-        const views = ['home', 'riwayat', 'laporan', 'input'];
-        const titles = { 'home': 'Dashboard', 'riwayat': 'Riwayat Transaksi', 'laporan': 'Laporan Keuangan', 'input': 'Kelola Transaksi' };
+        const views = ['home', 'riwayat', 'input', 'laporan', 'settings'];
+        const titles = { 'home': 'Dashboard', 'riwayat': 'Riwayat Transaksi', 'input': 'Input Transaksi', 'laporan': 'Laporan Keuangan', 'settings': 'Pengaturan' };
         
         views.forEach(v => {
             const viewEl = document.getElementById(`view-${v}`);
             const navEl = document.getElementById(`nav-${v}`);
             
             if(v === tab) {
-                viewEl.classList.remove("hidden");
-                if(navEl && v !== 'input') {
-                    navEl.classList.replace("text-slate-400", "text-indigo-600");
-                    navEl.classList.replace("dark:text-slate-500", "dark:text-indigo-400");
+                if(viewEl) viewEl.classList.remove("hidden");
+                if(navEl) {
+                    if(v === 'input') {
+                        // Tombol input bulat tetap berwarna indah
+                    } else {
+                        navEl.classList.replace("text-slate-400", "text-indigo-600");
+                        navEl.classList.replace("dark:text-slate-500", "dark:text-indigo-400");
+                    }
                 }
             } else {
-                viewEl.classList.add("hidden");
-                if(navEl && v !== 'input') {
-                    navEl.classList.replace("text-indigo-600", "text-slate-400");
-                    navEl.classList.replace("dark:text-indigo-400", "dark:text-slate-500");
+                if(viewEl) viewEl.classList.add("hidden");
+                if(navEl) {
+                    if(v !== 'input') {
+                        navEl.classList.replace("text-indigo-600", "text-slate-400");
+                        navEl.classList.replace("dark:text-indigo-400", "dark:text-slate-500");
+                    }
                 }
             }
         });
         
-        document.getElementById("header-title").innerText = titles[tab];
+        document.getElementById("header-title").innerText = titles[tab] || "FamilyWealth";
         
         if(tab === 'riwayat') renderRiwayatLengkap();
         if(tab === 'laporan') renderLaporanKeuangan();
+        if(tab === 'settings') {
+            const user = localStorage.getItem("fw_user") || "Guest";
+            document.getElementById("txt-user-display").innerText = user;
+        }
         
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -625,6 +625,18 @@
             
             globalTransactions.forEach((trx, index) => { trx._originalIndex = index; });
 
+            // Mengisi Dropdown Form Input Kategori Secara Dinamis
+            const inKategori = document.getElementById("in-kategori");
+            if(inKategori && res.categories) {
+                inKategori.innerHTML = '<option value="" disabled selected>Pilih Kategori</option>';
+                res.categories.forEach(kat => {
+                    let opt = document.createElement("option");
+                    opt.value = kat;
+                    opt.text = kat;
+                    inKategori.appendChild(opt);
+                });
+            }
+
             if(!isReload) {
                 const curM = new Date().getMonth().toString();
                 document.getElementById("filter-bulan").value = curM;
@@ -641,9 +653,21 @@
                     
                     filterPencatat.disabled = true;
                     filterPencatat.classList.add("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
+                    
+                    // Kunci otomatis pilihan form input sesuai akun pengisi yang masuk (Jika bukan admin)
+                    const capitalizedUser = user.charAt(0).toUpperCase() + user.slice(1).toLowerCase();
+                    if(capitalizedUser === "Suami" || capitalizedUser === "Istri") {
+                        setInputPencatat(capitalizedUser);
+                        document.getElementById("btn-pencatat-suami").disabled = (capitalizedUser !== "Suami");
+                        document.getElementById("btn-pencatat-istri").disabled = (capitalizedUser !== "Istri");
+                        if(capitalizedUser !== "Suami") document.getElementById("btn-pencatat-suami").classList.add("opacity-40", "cursor-not-allowed");
+                        if(capitalizedUser !== "Istri") document.getElementById("btn-pencatat-istri").classList.add("opacity-40", "cursor-not-allowed");
+                    }
                 } else {
                     filterPencatat.disabled = false;
                     filterPencatat.classList.remove("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
+                    document.getElementById("btn-pencatat-suami").disabled = false;
+                    document.getElementById("btn-pencatat-istri").disabled = false;
                 }
             }
             initRiwayatFilters(); 
@@ -705,7 +729,7 @@
         if(currKategori && currKategori !== "all") selectKategori.value = currKategori;
     }
 
-    // ======== MODIFIKASI: Menambahkan tombol Edit di Render Riwayat ========
+    // MODIFIKASI: MENAMPILKAN TOMBOL EDIT DAN DELETE YANG TOUCH-FRIENDLY DI SEBELAH KANAN
     function renderRiwayatLengkap() {
         const currentUser = (localStorage.getItem("fw_user") || "").toLowerCase();
         const rawFilterP = document.getElementById("filter-pencatat").value.toLowerCase();
@@ -751,24 +775,184 @@
             const badgeColor = pencatatText.toLowerCase() === 'suami' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400';
             const dateDisplay = new Date(trx.tgl).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
             
-            // Logika kemunculan Tombol Edit
-            const canEdit = (currentUser === 'admin' || pencatatText.toLowerCase() === currentUser);
-            // Parsing aman agar tidak crash kena petik di keterangan
             const trxSafeStr = encodeURIComponent(JSON.stringify(trx));
-            const tombolEdit = canEdit ? `<button onclick="openEdit('${trxSafeStr}')" class="btn-edit ml-2">Edit</button>` : '';
-            
-            html += `<div class="card p-4 flex flex-col gap-2 select-none transition-colors">
-                <div class="flex justify-between items-center border-b border-slate-50 dark:border-slate-700/50 pb-2">
-                    <div class="flex items-center">
+
+            html += `<div class="card p-4 flex justify-between items-center gap-4 select-none transition-colors">
+                <div class="min-w-0 flex-1 flex flex-col gap-1">
+                    <div class="flex items-center gap-2">
                         <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500">📅 ${dateDisplay}</span>
-                        ${tombolEdit}
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${badgeColor}">${pencatatText}</span>
                     </div>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${badgeColor}">${pencatatText}</span>
+                    <div class="min-w-0 mt-1">
+                        <p class="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">${trx.kategori || "-"}</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">${trx.keterangan || "-"}</p>
+                    </div>
+                    <span class="${isPengeluaran ? 'text-rose-500 dark:text-rose-400' : 'text-emerald-500 dark:text-emerald-400'} font-bold text-sm mt-1">
+                        ${isPengeluaran ? '-' : '+'}${formatter.format(trx.nominal)}
+                    </span>
                 </div>
-                <div class="flex justify-between items-center pt-1"><div class="min-w-0 pr-3 flex-1"><p class="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">${trx.kategori || "-"}</p><p class="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">${trx.keterangan || "-"}</p></div><span class="${isPengeluaran ? 'text-rose-500 dark:text-rose-400' : 'text-emerald-500 dark:text-emerald-400'} font-bold text-sm">${isPengeluaran ? '-' : '+'}${formatter.format(trx.nominal)}</span></div>
+                
+                <div class="flex items-center gap-2 shrink-0">
+                    <button onclick="openEdit('${trxSafeStr}')" class="w-12 h-12 flex items-center justify-center bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/50 rounded-2xl active:scale-90 transition shadow-sm" title="Edit Data">
+                        ✏️
+                    </button>
+                    <button onclick="openDelete(${trx.row})" class="w-12 h-12 flex items-center justify-center bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-200/50 dark:border-rose-900/50 rounded-2xl active:scale-90 transition shadow-sm" title="Hapus Data">
+                        🗑️
+                    </button>
+                </div>
             </div>`;
         });
         document.getElementById("list-riwayat-lengkap").innerHTML = html || '<div class="text-center py-10 select-none"><p class="text-sm text-slate-500 dark:text-slate-400">Tidak ada transaksi.</p></div>';
+    }
+
+    // INTERAKSI PILIHAN WARNA PASTEL FORM INPUT
+    function setInputPencatat(val) {
+        selectedInputPencatat = val;
+        document.getElementById("in-pencatat").value = val;
+        const btnSuami = document.getElementById("btn-pencatat-suami");
+        const btnIstri = document.getElementById("btn-pencatat-istri");
+        
+        if(val === 'Suami') {
+            btnSuami.className = "h-12 font-bold rounded-2xl transition-all border border-blue-300 bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 active:scale-95";
+            btnIstri.className = "h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95";
+        } else {
+            btnSuami.className = "h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95";
+            btnIstri.className = "h-12 font-bold rounded-2xl transition-all border border-pink-300 bg-pink-100 text-pink-700 dark:bg-pink-950/40 dark:text-pink-300 active:scale-95";
+        }
+    }
+
+    function setInputJenis(val) {
+        selectedInputJenis = val;
+        document.getElementById("in-jenis").value = val;
+        const btnMasuk = document.getElementById("btn-jenis-masuk");
+        const btnKeluar = document.getElementById("btn-jenis-keluar");
+        
+        if(val === 'Pemasukan') {
+            btnMasuk.className = "h-12 font-bold rounded-2xl transition-all border border-emerald-300 bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 active:scale-95";
+            btnKeluar.className = "h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95";
+        } else {
+            btnMasuk.className = "h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95";
+            btnKeluar.className = "h-12 font-bold rounded-2xl transition-all border border-rose-300 bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 active:scale-95";
+        }
+    }
+
+    // MEMBUKA MODE EDIT DATA & MENGISI KE FORM PASTEL
+    function openEdit(encodedItem) {
+        const item = JSON.parse(decodeURIComponent(encodedItem));
+        editMode = true;
+        editRow = item.row; // KTP baris presisi tinggi
+        
+        document.getElementById("input-view-title").innerHTML = "<span>✏️</span> Edit Transaksi";
+        document.getElementById("btn-batal-edit").classList.remove("hidden");
+        
+        setInputPencatat(item.pencatat);
+        setInputJenis(item.jenis);
+        
+        if(item.tgl) {
+            const d = new Date(item.tgl);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            document.getElementById("in-tgl").value = `${y}-${m}-${day}`;
+        }
+        
+        document.getElementById("in-kategori").value = item.kategori;
+        document.getElementById("in-keterangan").value = item.keterangan;
+        document.getElementById("in-nominal").value = item.nominal;
+        
+        switchTab('input');
+    }
+
+    function cancelEdit() {
+        resetInputForm();
+        switchTab('riwayat');
+    }
+
+    function resetInputForm() {
+        editMode = false;
+        editRow = null;
+        document.getElementById("input-view-title").innerHTML = "<span>✍️</span> Input Transaksi";
+        document.getElementById("btn-batal-edit").classList.add("hidden");
+        document.getElementById("form-transaksi").reset();
+        
+        document.getElementById("in-pencatat").value = "";
+        document.getElementById("in-jenis").value = "";
+        
+        const user = localStorage.getItem("fw_user");
+        if (!user || user.toLowerCase() === "admin") {
+            document.getElementById("btn-pencatat-suami").className = "h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95";
+            document.getElementById("btn-pencatat-istri").className = "h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95";
+        }
+        document.getElementById("btn-jenis-masuk").className = "h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95";
+        document.getElementById("btn-jenis-keluar").className = "h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95";
+    }
+
+    // PROSES EKSEKUSI PENGIRIMAN DATA KE SERVER GS
+    function saveTransactionForm(e) {
+        e.preventDefault();
+        const pencatat = document.getElementById("in-pencatat").value;
+        const jenis = document.getElementById("in-jenis").value;
+        
+        if(!pencatat) { alert("Pilih Pencatat (Suami / Istri) terlebih dahulu!"); return; }
+        if(!jenis) { alert("Pilih Jenis Transaksi (Pemasukan / Pengeluaran)!"); return; }
+        
+        document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
+        
+        const payload = {
+            action: "saveTransaction",
+            mode: editMode ? "edit" : "add",
+            row: editRow,
+            pencatat: pencatat,
+            jenis: jenis,
+            tgl: document.getElementById("in-tgl").value,
+            kategori: document.getElementById("in-kategori").value,
+            keterangan: document.getElementById("in-keterangan").value,
+            nominal: parseFloat(document.getElementById("in-nominal").value),
+            user: localStorage.getItem("fw_user") || "Guest"
+        };
+        
+        fetch(API_URL, { method: "POST", body: JSON.stringify(payload) })
+        .then(res => res.json())
+        .then(res => {
+            if(res.status === "success") {
+                resetInputForm();
+                loadDataFromServer(true);
+                switchTab('home');
+            } else {
+                alert("Gagal menyimpan transaksi: " + res.message);
+                document.getElementById("loader").classList.add("opacity-0", "pointer-events-none");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Terjadi masalah jaringan.");
+            document.getElementById("loader").classList.add("opacity-0", "pointer-events-none");
+        });
+    }
+
+    // PROSES PENGHAPUSAN JITU DATA BERDASARKAN BARIS SHEET
+    function openDelete(rowId) {
+        if(confirm("Apakah Anda yakin ingin menghapus transaksi ini dari Google Sheet?")) {
+            document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
+            fetch(API_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "deleteTransaction", row: rowId })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.status === "success") {
+                    loadDataFromServer(true);
+                } else {
+                    alert("Gagal menghapus: " + res.message);
+                    document.getElementById("loader").classList.add("opacity-0", "pointer-events-none");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Masalah komunikasi server.");
+                document.getElementById("loader").classList.add("opacity-0", "pointer-events-none");
+            });
+        }
     }
 
     function renderFilteredData() {
@@ -1034,152 +1218,6 @@
         }
     }
 
-
-    // ======== FITUR TAMBAHAN: FUNGSI INPUT & EDIT TRANSAKSI ========
-    
-    // Fungsi untuk memuat list Kategori otomatis ke select form
-    function populateKategoriForm() {
-        const selectKategori = document.getElementById("in-kategori");
-        selectKategori.innerHTML = '<option value="">Pilih Kategori</option>';
-        const kategoriSet = new Set();
-        
-        globalTransactions.forEach(trx => { 
-            if(trx.kategori) kategoriSet.add(trx.kategori.toString().trim());
-        });
-
-        Array.from(kategoriSet).sort().forEach(kat => {
-            let option = document.createElement("option"); 
-            option.value = kat; 
-            option.text = kat; 
-            selectKategori.appendChild(option);
-        });
-    }
-
-    function openInputMode() {
-        editMode = false; 
-        document.getElementById('form-title').innerText = "Input Transaksi Baru";
-        document.getElementById('transaksi-form').reset();
-        
-        populateKategoriForm();
-        
-        let activeUser = localStorage.getItem("fw_user") || "Admin";
-        // Agar pas default nama kapital di depan
-        activeUser = activeUser.charAt(0).toUpperCase() + activeUser.slice(1).toLowerCase(); 
-        
-        const pencatatForm = document.getElementById('in-pencatat');
-        if(activeUser !== "Admin") {
-            pencatatForm.value = activeUser;
-            pencatatForm.disabled = true;
-            pencatatForm.classList.add("bg-slate-100", "text-slate-500", "dark:bg-slate-800");
-        } else {
-            pencatatForm.disabled = false;
-            pencatatForm.classList.remove("bg-slate-100", "text-slate-500", "dark:bg-slate-800");
-        }
-        
-        document.getElementById('in-tgl').value = new Date().toISOString().split('T')[0]; // Default hari ini
-        
-        switchTab('input');
-    }
-
-    function openEdit(encodedItem) {
-        const item = JSON.parse(decodeURIComponent(encodedItem));
-        
-        editMode = true; 
-        editRow = item.row;
-        
-        document.getElementById('form-title').innerText = "Edit Transaksi";
-        populateKategoriForm();
-
-        const pencatatForm = document.getElementById('in-pencatat');
-        if (localStorage.getItem("fw_user").toLowerCase() !== "admin") {
-            pencatatForm.disabled = true;
-            pencatatForm.classList.add("bg-slate-100", "text-slate-500", "dark:bg-slate-800");
-        } else {
-            pencatatForm.disabled = false;
-            pencatatForm.classList.remove("bg-slate-100", "text-slate-500", "dark:bg-slate-800");
-        }
-
-        document.getElementById('in-pencatat').value = item.pencatat;
-        
-        // Penyesuaian agar Capitalize bisa cocok
-        const jenisOptions = Array.from(document.getElementById('in-jenis').options);
-        const matchJenis = jenisOptions.find(opt => opt.value.toLowerCase() === (item.jenis || "").toLowerCase());
-        if(matchJenis) document.getElementById('in-jenis').value = matchJenis.value;
-
-        // Set Date
-        if(item.tgl) document.getElementById('in-tgl').value = new Date(item.tgl).toISOString().split('T')[0];
-        
-        // Set Kategori
-        const katOptions = Array.from(document.getElementById('in-kategori').options);
-        const matchKat = katOptions.find(opt => opt.value.toLowerCase() === (item.kategori || "").toLowerCase());
-        if(matchKat) {
-            document.getElementById('in-kategori').value = matchKat.value;
-            document.getElementById('in-kategori-baru').value = "";
-        } else {
-            document.getElementById('in-kategori').value = "";
-            document.getElementById('in-kategori-baru').value = item.kategori;
-        }
-
-        document.getElementById('in-keterangan').value = item.keterangan || "";
-        document.getElementById('in-nominal').value = new Intl.NumberFormat('id-ID').format(item.nominal);
-        
-        switchTab('input');
-    }
-
-    function formatRupiah(input) {
-        let val = input.value.replace(/[^0-9]/g, '');
-        input.value = val ? new Intl.NumberFormat('id-ID').format(val) : '';
-    }
-
-    function confirmSubmit() { 
-        if(confirm("Yakin ingin menyimpan transaksi ini?")) submitForm(); 
-    }
-
-    function submitForm() {
-        // Ambil Kategori: Kalau text input baru ada isinya, pakai itu. Kalau kosong, pakai dropdown.
-        let finalKategori = document.getElementById('in-kategori-baru').value.trim();
-        if(!finalKategori) {
-            finalKategori = document.getElementById('in-kategori').value;
-        }
-
-        if(!document.getElementById('in-nominal').value || !finalKategori || !document.getElementById('in-tgl').value) {
-            alert("Harap lengkapi semua data wajib (Tanggal, Kategori, Nominal).");
-            return;
-        }
-
-        document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
-
-        const payload = {
-            action: 'saveTransaction', 
-            mode: editMode ? 'edit' : 'add', 
-            row: editRow,
-            user: localStorage.getItem("fw_user"), 
-            pencatat: document.getElementById('in-pencatat').value,
-            jenis: document.getElementById('in-jenis').value, 
-            tgl: document.getElementById('in-tgl').value,
-            kategori: finalKategori, 
-            keterangan: document.getElementById('in-keterangan').value,
-            nominal: parseInt(document.getElementById('in-nominal').value.replace(/\./g, ''))
-        };
-
-        fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
-        .then(res => res.json())
-        .then(data => { 
-            alert('Transaksi berhasil disimpan!'); 
-            // Clear form
-            document.getElementById('transaksi-form').reset();
-            // Reload ke home agar merefresh data
-            loadDataFromServer(true);
-            setTimeout(() => switchTab('home'), 500); 
-        })
-        .catch(err => {
-            console.error("Error Saving:", err);
-            document.getElementById("loader").classList.add("opacity-0", "pointer-events-none");
-            alert("Terjadi kesalahan saat menyimpan data.");
-        });
-    }
-
-    // ======== INIT ========
     window.onload = () => {
         initTheme(); 
         if(localStorage.getItem("fw_user")) {
