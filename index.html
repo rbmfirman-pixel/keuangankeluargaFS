@@ -61,8 +61,6 @@
     /* ==========================================================================
        UPGRADE TAMPILAN: MINT GLASSMORPHISM (SUPPORT LIGHT & DARK MODE)
        ========================================================================== */
-    
-    /* ---- MINT: LIGHT MODE (Terang) ---- */
     html.mint body {
         background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 50%, #81e6d9 100%) !important;
         color: #234e52 !important;
@@ -143,23 +141,12 @@
         border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
     }
     html.mint.dark .text-slate-800, html.mint.dark .text-slate-700, html.mint.dark .text-slate-600, 
-    html.mint.dark .dark\:text-slate-100, html.mint.dark .dark\:text-slate-200, html.mint.dark #header-title { 
-        color: #ccfbf1 !important; 
-    }
+    html.mint.dark .dark\:text-slate-100, html.mint.dark .dark\:text-slate-200, html.mint.dark #header-title { color: #ccfbf1 !important; }
     html.mint.dark .text-slate-500, html.mint.dark .text-slate-400,
-    html.mint.dark .dark\:text-slate-400, html.mint.dark .dark\:text-slate-500 { 
-        color: #5eead4 !important; 
-    }
-    html.mint.dark .bg-indigo-50, html.mint.dark .dark\:bg-indigo-900\/30 { 
-        background: rgba(13, 148, 136, 0.15) !important; 
-        border-color: rgba(20, 184, 166, 0.2) !important; 
-    }
+    html.mint.dark .dark\:text-slate-400, html.mint.dark .dark\:text-slate-500 { color: #5eead4 !important; }
+    html.mint.dark .bg-indigo-50, html.mint.dark .dark\:bg-indigo-900\/30 { background: rgba(13, 148, 136, 0.15) !important; border-color: rgba(20, 184, 166, 0.2) !important; }
     html.mint.dark .text-indigo-900, html.mint.dark .dark\:text-indigo-300 { color: #99f6e4 !important; }
-    html.mint.dark #btn-reload { 
-        background: rgba(30, 41, 59, 0.6) !important; 
-        border-color: rgba(255, 255, 255, 0.1) !important; 
-        color: #2dd4bf !important; 
-    }
+    html.mint.dark #btn-reload { background: rgba(30, 41, 59, 0.6) !important; border-color: rgba(255, 255, 255, 0.1) !important; color: #2dd4bf !important; }
     html.mint.dark .loader-overlay { background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%) !important; }
     html.mint.dark .spinner { border-color: rgba(255,255,255,0.1); border-top-color: #2dd4bf; }
   </style>
@@ -194,8 +181,6 @@
       <div class="grid grid-cols-2 gap-4">
         <select id="filter-pencatat" onchange="renderFilteredData(); refreshActiveTab();" class="cursor-pointer shadow-sm">
           <option value="all">Semua Orang</option>
-          <option value="Suami">Suami</option>
-          <option value="Istri">Istri</option>
         </select>
         <select id="filter-bulan" onchange="renderFilteredData()" class="cursor-pointer shadow-sm">
           <option value="all">Semua Bulan</option>
@@ -257,17 +242,15 @@
     <main id="view-input" class="hidden px-6 space-y-4 fade-in">
       <div class="card p-6 space-y-5">
         <h3 id="input-view-title" class="font-bold text-base text-slate-800 dark:text-slate-100 flex items-center gap-2 select-none">
-          <span>✍️</span> Input Transaksi
+          <span>🪶</span> Input Transaksi
         </h3>
         
         <form id="form-transaksi" onsubmit="saveTransactionForm(event)" class="space-y-5">
           <div>
-            <label class="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 select-none">Pencatat</label>
-            <div class="grid grid-cols-2 gap-3">
-              <button type="button" id="btn-pencatat-suami" onclick="setInputPencatat('Suami')" class="h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95">👨 Suami</button>
-              <button type="button" id="btn-pencatat-istri" onclick="setInputPencatat('Istri')" class="h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95">👩 Istri</button>
-            </div>
-            <input type="hidden" id="in-pencatat" required>
+            <label class="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 select-none">Pencatat</label>
+            <select id="in-pencatat" required class="shadow-sm cursor-pointer disabled:bg-slate-100 disabled:text-slate-500 dark:disabled:bg-slate-800 dark:disabled:text-slate-400 disabled:cursor-not-allowed">
+              <option value="" disabled selected>Pilih Pencatat</option>
+            </select>
           </div>
 
           <div>
@@ -306,7 +289,7 @@
 
           <div class="pt-2 space-y-2">
             <button type="submit" class="w-full h-14 bg-indigo-600 dark:bg-indigo-500 text-white font-bold rounded-2xl shadow-md hover:bg-indigo-700 dark:hover:bg-indigo-600 transition active:scale-95 text-sm">
-              💾 Simpan Transaksi
+              📁 Simpan Transaksi
             </button>
             <button type="button" id="btn-batal-edit" onclick="cancelEdit()" class="hidden w-full h-14 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-2xl transition active:scale-95 text-sm">
               ❌ Batal Edit
@@ -350,7 +333,7 @@
       </div>
 
       <div id="admin-comparison-section" class="card p-5 hidden">
-        <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 mb-4 select-none">Komparasi Finansial Pasangan</h3>
+        <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 mb-4 select-none">Komparasi Finansial Pencatat</h3>
         <div class="h-52">
           <canvas id="canvasKomparasiPasangan"></canvas>
         </div>
@@ -393,14 +376,14 @@
 
         <button onclick="clearCache()" class="w-full flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 active:bg-slate-50 dark:active:bg-slate-700 transition shadow-sm">
           <div class="flex items-center gap-3">
-            <span class="text-xl select-none">🧹</span>
+            <span class="text-xl select-none">🌪️</span>
             <span class="font-bold text-slate-700 dark:text-slate-200 text-sm">Bersihkan Cache Data</span>
           </div>
           <span class="text-slate-400 dark:text-slate-500 text-xs font-bold bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-md">Refresh</span>
         </button>
 
         <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 p-4 rounded-2xl font-bold active:bg-rose-100 dark:active:bg-rose-900/50 transition border border-rose-100 dark:border-rose-900 text-sm">
-          <span class="text-lg select-none">🚪</span> Keluar Aplikasi
+          <span class="text-lg select-none">💣</span> Keluar Aplikasi
         </button>
       </div>
     </main>
@@ -450,8 +433,6 @@
     let chartCompareInstance = null;
     
     // Status Form Input & Edit Global
-    let selectedInputPencatat = "";
-    let selectedInputJenis = "";
     let editMode = false;
     let editRow = null;
     
@@ -460,7 +441,6 @@
     function initTheme() {
         const savedTheme = localStorage.getItem('fw_theme') || 'auto';
         const savedStyle = localStorage.getItem('fw_style') || 'default';
-        
         setStyle(savedStyle, false);
         setTheme(savedTheme, false);
         
@@ -473,7 +453,6 @@
 
     function setStyle(style, updateCharts = true) {
         localStorage.setItem('fw_style', style);
-        
         if (style === 'mint') { document.documentElement.classList.add('mint'); } 
         else { document.documentElement.classList.remove('mint'); }
 
@@ -489,13 +468,11 @@
                 }
             }
         });
-
         if(updateCharts) updateChartColors();
     }
 
     function setTheme(theme, updateCharts = true) {
         localStorage.setItem('fw_theme', theme);
-        
         let isDark = false;
         if (theme === 'dark') { isDark = true; } 
         else if (theme === 'light') { isDark = false; } 
@@ -515,7 +492,6 @@
                 }
             }
         });
-
         if(updateCharts) updateChartColors();
     }
 
@@ -567,7 +543,6 @@
         }
     }
 
-    // MANAJEMEN TAB AKAN MENAMPILKAN DAN MENYEMBUNYIKAN SEKSI UTAMA BERDASARKAN ID
     function switchTab(tab) {
         const views = ['home', 'riwayat', 'input', 'laporan', 'settings'];
         const titles = { 'home': 'Dashboard', 'riwayat': 'Riwayat Transaksi', 'input': 'Input Transaksi', 'laporan': 'Laporan Keuangan', 'settings': 'Pengaturan' };
@@ -578,21 +553,15 @@
             
             if(v === tab) {
                 if(viewEl) viewEl.classList.remove("hidden");
-                if(navEl) {
-                    if(v === 'input') {
-                        // Tombol input bulat tetap berwarna indah
-                    } else {
-                        navEl.classList.replace("text-slate-400", "text-indigo-600");
-                        navEl.classList.replace("dark:text-slate-500", "dark:text-indigo-400");
-                    }
+                if(navEl && v !== 'input') {
+                    navEl.classList.replace("text-slate-400", "text-indigo-600");
+                    navEl.classList.replace("dark:text-slate-500", "dark:text-indigo-400");
                 }
             } else {
                 if(viewEl) viewEl.classList.add("hidden");
-                if(navEl) {
-                    if(v !== 'input') {
-                        navEl.classList.replace("text-indigo-600", "text-slate-400");
-                        navEl.classList.replace("dark:text-indigo-400", "dark:text-slate-500");
-                    }
+                if(navEl && v !== 'input') {
+                    navEl.classList.replace("text-indigo-600", "text-slate-400");
+                    navEl.classList.replace("dark:text-indigo-400", "dark:text-slate-500");
                 }
             }
         });
@@ -605,7 +574,6 @@
             const user = localStorage.getItem("fw_user") || "Guest";
             document.getElementById("txt-user-display").innerText = user;
         }
-        
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -622,52 +590,77 @@
       .then(res => { 
         if(res.status === "success") {
             globalTransactions = res.data;
-            
             globalTransactions.forEach((trx, index) => { trx._originalIndex = index; });
 
-            // Mengisi Dropdown Form Input Kategori Secara Dinamis
+            // 1. MENGISI DROPDOWN KATEGORI
             const inKategori = document.getElementById("in-kategori");
             if(inKategori && res.categories) {
                 inKategori.innerHTML = '<option value="" disabled selected>Pilih Kategori</option>';
                 res.categories.forEach(kat => {
-                    let opt = document.createElement("option");
-                    opt.value = kat;
-                    opt.text = kat;
+                    let opt = document.createElement("option"); opt.value = kat; opt.text = kat;
                     inKategori.appendChild(opt);
                 });
             }
 
+            // 2. MENGISI DROPDOWN PENCATAT (INPUT & FILTER) BERDASARKAN DATA DARI SHEET AKUN
+            const inPencatat = document.getElementById("in-pencatat");
+            const filterPencatat = document.getElementById("filter-pencatat");
+            
+            if(res.users) {
+                // Untuk Form Input
+                if(inPencatat) {
+                    inPencatat.innerHTML = '<option value="" disabled selected>Pilih Pencatat</option>';
+                    res.users.forEach(u => {
+                        let opt = document.createElement("option"); opt.value = u; opt.text = u;
+                        inPencatat.appendChild(opt);
+                    });
+                }
+                
+                // Untuk Filter Dashboard (Bagi Admin, berikan opsi semua orang)
+                const userLogin = localStorage.getItem("fw_user") || "";
+                if(filterPencatat && userLogin.toLowerCase() === "admin") {
+                    filterPencatat.innerHTML = '<option value="all">Semua Orang</option>';
+                    res.users.forEach(u => {
+                        let opt = document.createElement("option"); opt.value = u; opt.text = u;
+                        filterPencatat.appendChild(opt);
+                    });
+                }
+            }
+
+            // 3. LOGIKA KUNCI OTOMATIS BERDASARKAN AKUN LOGIN
             if(!isReload) {
                 const curM = new Date().getMonth().toString();
                 document.getElementById("filter-bulan").value = curM;
                 document.getElementById("filter-riwayat-bulan").value = curM;
                 document.getElementById("filter-laporan-bulan").value = curM;
                 
-                const user = localStorage.getItem("fw_user");
-                const filterPencatat = document.getElementById("filter-pencatat");
+                const user = localStorage.getItem("fw_user") || "";
+                const capUser = user.charAt(0).toUpperCase() + user.slice(1).toLowerCase();
                 
                 if (user && user.toLowerCase() !== "admin") {
-                    let matchedOpt = Array.from(filterPencatat.options).find(opt => opt.value.toLowerCase() === user.toLowerCase());
-                    if(matchedOpt) { filterPencatat.value = matchedOpt.value; } 
-                    else { filterPencatat.innerHTML = `<option value="${user}">${user}</option>`; }
-                    
+                    // USER BIASA: Kunci Dashboard ke namanya
+                    filterPencatat.innerHTML = `<option value="${capUser}">${capUser}</option>`;
+                    filterPencatat.value = capUser;
                     filterPencatat.disabled = true;
                     filterPencatat.classList.add("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
                     
-                    // Kunci otomatis pilihan form input sesuai akun pengisi yang masuk (Jika bukan admin)
-                    const capitalizedUser = user.charAt(0).toUpperCase() + user.slice(1).toLowerCase();
-                    if(capitalizedUser === "Suami" || capitalizedUser === "Istri") {
-                        setInputPencatat(capitalizedUser);
-                        document.getElementById("btn-pencatat-suami").disabled = (capitalizedUser !== "Suami");
-                        document.getElementById("btn-pencatat-istri").disabled = (capitalizedUser !== "Istri");
-                        if(capitalizedUser !== "Suami") document.getElementById("btn-pencatat-suami").classList.add("opacity-40", "cursor-not-allowed");
-                        if(capitalizedUser !== "Istri") document.getElementById("btn-pencatat-istri").classList.add("opacity-40", "cursor-not-allowed");
+                    // USER BIASA: Kunci Form Input ke namanya
+                    if(inPencatat) {
+                        // Pastikan opsinya ada
+                        if(!Array.from(inPencatat.options).some(opt => opt.value === capUser)) {
+                            let opt = document.createElement("option"); opt.value = capUser; opt.text = capUser;
+                            inPencatat.appendChild(opt);
+                        }
+                        inPencatat.value = capUser;
+                        inPencatat.disabled = true; // Kunci permanen untuk User
                     }
                 } else {
+                    // ADMIN: Bebas Memilih
                     filterPencatat.disabled = false;
                     filterPencatat.classList.remove("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
-                    document.getElementById("btn-pencatat-suami").disabled = false;
-                    document.getElementById("btn-pencatat-istri").disabled = false;
+                    if(inPencatat) {
+                        inPencatat.disabled = false; // Buka kunci untuk Admin
+                    }
                 }
             }
             initRiwayatFilters(); 
@@ -687,7 +680,6 @@
     function initRiwayatFilters() {
         const selectTahun = document.getElementById("filter-riwayat-tahun");
         const selectLaporanTahun = document.getElementById("filter-laporan-tahun");
-        
         const currTahun = selectTahun.value;
         const currLapTahun = selectLaporanTahun.value;
         
@@ -706,9 +698,7 @@
                 const year = new Date(targetDate).getFullYear(); 
                 if(year && !isNaN(year)) tahunSet.add(year); 
             } 
-            if(trx.kategori) {
-                kategoriSet.add(trx.kategori.toString().trim());
-            }
+            if(trx.kategori) kategoriSet.add(trx.kategori.toString().trim());
         });
 
         Array.from(tahunSet).sort((a,b) => b - a).forEach(thn => { 
@@ -729,7 +719,6 @@
         if(currKategori && currKategori !== "all") selectKategori.value = currKategori;
     }
 
-    // MODIFIKASI: MENAMPILKAN TOMBOL EDIT DAN DELETE YANG TOUCH-FRIENDLY DI SEBELAH KANAN
     function renderRiwayatLengkap() {
         const currentUser = (localStorage.getItem("fw_user") || "").toLowerCase();
         const rawFilterP = document.getElementById("filter-pencatat").value.toLowerCase();
@@ -762,9 +751,7 @@
         filtered.sort((a, b) => {
             const dateA = new Date(a.tgl);
             const dateB = new Date(b.tgl);
-            if (dateB.getTime() !== dateA.getTime()) {
-                return dateB - dateA;
-            }
+            if (dateB.getTime() !== dateA.getTime()) { return dateB - dateA; }
             return (b._originalIndex || 0) - (a._originalIndex || 0);
         });
 
@@ -772,15 +759,19 @@
         filtered.forEach(trx => {
             const isPengeluaran = (trx.jenis || "").toString().toLowerCase() === 'pengeluaran';
             const pencatatText = trx.pencatat ? trx.pencatat.toString() : '?';
-            const badgeColor = pencatatText.toLowerCase() === 'suami' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400';
+            // Styling Badge Dinamis (Akan acak pastel untuk nama baru, fix untuk suami/istri)
+            let badgeColor = 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300';
+            if(pencatatText.toLowerCase() === 'suami') badgeColor = 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400';
+            else if(pencatatText.toLowerCase() === 'istri') badgeColor = 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400';
+            else badgeColor = 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400'; // Default warna lain
+
             const dateDisplay = new Date(trx.tgl).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-            
             const trxSafeStr = encodeURIComponent(JSON.stringify(trx));
 
             html += `<div class="card p-4 flex justify-between items-center gap-4 select-none transition-colors">
                 <div class="min-w-0 flex-1 flex flex-col gap-1">
                     <div class="flex items-center gap-2">
-                        <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500">📅 ${dateDisplay}</span>
+                        <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500">🗓️ ${dateDisplay}</span>
                         <span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${badgeColor}">${pencatatText}</span>
                     </div>
                     <div class="min-w-0 mt-1">
@@ -793,36 +784,16 @@
                 </div>
                 
                 <div class="flex items-center gap-2 shrink-0">
-                    <button onclick="openEdit('${trxSafeStr}')" class="w-12 h-12 flex items-center justify-center bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/50 rounded-2xl active:scale-90 transition shadow-sm" title="Edit Data">
-                        ✏️
-                    </button>
-                    <button onclick="openDelete(${trx.row})" class="w-12 h-12 flex items-center justify-center bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-200/50 dark:border-rose-900/50 rounded-2xl active:scale-90 transition shadow-sm" title="Hapus Data">
-                        🗑️
-                    </button>
+                    <button onclick="openEdit('${trxSafeStr}')" class="w-12 h-12 flex items-center justify-center bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/50 rounded-2xl active:scale-90 transition shadow-sm" title="Edit Data">✏️</button>
+                    <button onclick="openDelete(${trx.row})" class="w-12 h-12 flex items-center justify-center bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-200/50 dark:border-rose-900/50 rounded-2xl active:scale-90 transition shadow-sm" title="Hapus Data">🗑️</button>
                 </div>
             </div>`;
         });
         document.getElementById("list-riwayat-lengkap").innerHTML = html || '<div class="text-center py-10 select-none"><p class="text-sm text-slate-500 dark:text-slate-400">Tidak ada transaksi.</p></div>';
     }
 
-    // INTERAKSI PILIHAN WARNA PASTEL FORM INPUT
-    function setInputPencatat(val) {
-        selectedInputPencatat = val;
-        document.getElementById("in-pencatat").value = val;
-        const btnSuami = document.getElementById("btn-pencatat-suami");
-        const btnIstri = document.getElementById("btn-pencatat-istri");
-        
-        if(val === 'Suami') {
-            btnSuami.className = "h-12 font-bold rounded-2xl transition-all border border-blue-300 bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 active:scale-95";
-            btnIstri.className = "h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95";
-        } else {
-            btnSuami.className = "h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95";
-            btnIstri.className = "h-12 font-bold rounded-2xl transition-all border border-pink-300 bg-pink-100 text-pink-700 dark:bg-pink-950/40 dark:text-pink-300 active:scale-95";
-        }
-    }
-
+    // Interaksi Tombol Pemasukan/Pengeluaran
     function setInputJenis(val) {
-        selectedInputJenis = val;
         document.getElementById("in-jenis").value = val;
         const btnMasuk = document.getElementById("btn-jenis-masuk");
         const btnKeluar = document.getElementById("btn-jenis-keluar");
@@ -836,16 +807,22 @@
         }
     }
 
-    // MEMBUKA MODE EDIT DATA & MENGISI KE FORM PASTEL
     function openEdit(encodedItem) {
         const item = JSON.parse(decodeURIComponent(encodedItem));
         editMode = true;
-        editRow = item.row; // KTP baris presisi tinggi
+        editRow = item.row; 
         
         document.getElementById("input-view-title").innerHTML = "<span>✏️</span> Edit Transaksi";
         document.getElementById("btn-batal-edit").classList.remove("hidden");
         
-        setInputPencatat(item.pencatat);
+        // Memasukkan Pencatat (Jika data lama tidak ada di dropdown, tambahkan sementara)
+        const inPencatat = document.getElementById("in-pencatat");
+        if(inPencatat && !Array.from(inPencatat.options).some(opt => opt.value === item.pencatat)) {
+            let opt = document.createElement("option"); opt.value = item.pencatat; opt.text = item.pencatat;
+            inPencatat.appendChild(opt);
+        }
+        inPencatat.value = item.pencatat;
+        
         setInputJenis(item.jenis);
         
         if(item.tgl) {
@@ -871,29 +848,31 @@
     function resetInputForm() {
         editMode = false;
         editRow = null;
-        document.getElementById("input-view-title").innerHTML = "<span>✍️</span> Input Transaksi";
+        document.getElementById("input-view-title").innerHTML = "<span🪶</span> Input Transaksi";
         document.getElementById("btn-batal-edit").classList.add("hidden");
         document.getElementById("form-transaksi").reset();
         
-        document.getElementById("in-pencatat").value = "";
         document.getElementById("in-jenis").value = "";
-        
-        const user = localStorage.getItem("fw_user");
-        if (!user || user.toLowerCase() === "admin") {
-            document.getElementById("btn-pencatat-suami").className = "h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95";
-            document.getElementById("btn-pencatat-istri").className = "h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95";
-        }
         document.getElementById("btn-jenis-masuk").className = "h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95";
         document.getElementById("btn-jenis-keluar").className = "h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95";
+
+        // Reset Dropdown Pencatat ke Akun yang Login
+        const user = localStorage.getItem("fw_user") || "";
+        const inPencatat = document.getElementById("in-pencatat");
+        if (user && user.toLowerCase() !== "admin") {
+            const capUser = user.charAt(0).toUpperCase() + user.slice(1).toLowerCase();
+            inPencatat.value = capUser;
+        } else {
+            inPencatat.value = "";
+        }
     }
 
-    // PROSES EKSEKUSI PENGIRIMAN DATA KE SERVER GS
     function saveTransactionForm(e) {
         e.preventDefault();
         const pencatat = document.getElementById("in-pencatat").value;
         const jenis = document.getElementById("in-jenis").value;
         
-        if(!pencatat) { alert("Pilih Pencatat (Suami / Istri) terlebih dahulu!"); return; }
+        if(!pencatat) { alert("Pilih Pencatat terlebih dahulu!"); return; }
         if(!jenis) { alert("Pilih Jenis Transaksi (Pemasukan / Pengeluaran)!"); return; }
         
         document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
@@ -922,32 +901,23 @@
                 alert("Gagal menyimpan transaksi: " + res.message);
                 document.getElementById("loader").classList.add("opacity-0", "pointer-events-none");
             }
-        })
-        .catch(err => {
+        }).catch(err => {
             console.error(err);
             alert("Terjadi masalah jaringan.");
             document.getElementById("loader").classList.add("opacity-0", "pointer-events-none");
         });
     }
 
-    // PROSES PENGHAPUSAN JITU DATA BERDASARKAN BARIS SHEET
     function openDelete(rowId) {
         if(confirm("Apakah Anda yakin ingin menghapus transaksi ini dari Google Sheet?")) {
             document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
             fetch(API_URL, {
                 method: "POST",
                 body: JSON.stringify({ action: "deleteTransaction", row: rowId })
-            })
-            .then(res => res.json())
-            .then(res => {
-                if(res.status === "success") {
-                    loadDataFromServer(true);
-                } else {
-                    alert("Gagal menghapus: " + res.message);
-                    document.getElementById("loader").classList.add("opacity-0", "pointer-events-none");
-                }
-            })
-            .catch(err => {
+            }).then(res => res.json()).then(res => {
+                if(res.status === "success") { loadDataFromServer(true); } 
+                else { alert("Gagal menghapus: " + res.message); document.getElementById("loader").classList.add("opacity-0", "pointer-events-none"); }
+            }).catch(err => {
                 console.error(err);
                 alert("Masalah komunikasi server.");
                 document.getElementById("loader").classList.add("opacity-0", "pointer-events-none");
@@ -978,9 +948,7 @@
         if (filterB === "all") { 
             if (jenis === "pemasukan") saldoAwal += n; 
         } else { 
-            if (parseInt(m) < parseInt(filterB)) { 
-                saldoAwal += (jenis === "pemasukan" ? n : -n); 
-            } 
+            if (parseInt(m) < parseInt(filterB)) { saldoAwal += (jenis === "pemasukan" ? n : -n); } 
         }
         
         if (filterB === "all" || m === filterB) { 
@@ -993,7 +961,6 @@
       document.getElementById("txt-saldo").innerText = formatter.format((filterB === "all" ? totalP : saldoAwal) + totalP - totalK);
       
       let html = "";
-      
       globalTransactions.filter(t => {
           const tDate = t.tgl;
           if(!tDate || isNaN(new Date(tDate))) return false;
@@ -1003,9 +970,7 @@
       }).sort((a,b) => {
           const dateA = new Date(a.tgl);
           const dateB = new Date(b.tgl);
-          if (dateA.getTime() !== dateB.getTime()) {
-              return dateA - dateB;
-          }
+          if (dateA.getTime() !== dateB.getTime()) { return dateA - dateB; }
           return (a._originalIndex || 0) - (b._originalIndex || 0);
       }).slice(-5).reverse().forEach(trx => {
         const isPengeluaran = (trx.jenis || "").toString().toLowerCase() === 'pengeluaran';
@@ -1030,7 +995,6 @@
           if(!targetDate) return;
           const tD = new Date(targetDate);
           if(isNaN(tD)) return;
-
           const matchPencatat = (filterP === "all" || (trx.pencatat || "").toString().toLowerCase() === filterP);
           
           if (tD.getDate() === d.getDate() && tD.getMonth() === d.getMonth() && tD.getFullYear() === d.getFullYear() && matchPencatat && (trx.jenis || "").toString().toLowerCase() === 'pengeluaran') {
@@ -1056,9 +1020,7 @@
         const filterB = document.getElementById("filter-laporan-bulan").value;
         const filterT = document.getElementById("filter-laporan-tahun").value;
         
-        let totalPemasukan = 0;
-        let totalPengeluaran = 0;
-        const kategoriMap = {};
+        let totalPemasukan = 0; let totalPengeluaran = 0; const kategoriMap = {};
         
         globalTransactions.forEach(trx => {
             const targetDate = trx.tgl;
@@ -1074,9 +1036,8 @@
                 const nominal = parseFloat(trx.nominal) || 0;
                 const jenis = (trx.jenis || "").toString().toLowerCase();
                 
-                if(jenis === 'pemasukan') {
-                    totalPemasukan += nominal;
-                } else if(jenis === 'pengeluaran') {
+                if(jenis === 'pemasukan') { totalPemasukan += nominal; } 
+                else if(jenis === 'pengeluaran') {
                     totalPengeluaran += nominal;
                     const kat = trx.kategori ? trx.kategori.toString().trim() : "Lainnya";
                     kategoriMap[kat] = (kategoriMap[kat] || 0) + nominal;
@@ -1091,26 +1052,13 @@
         const katData = Object.values(kategoriMap);
         
         if(chartDoughnutInstance) chartDoughnutInstance.destroy();
-        
         if(katData.length > 0) {
             document.getElementById("canvasDistribusiKategori").classList.remove("hidden");
             document.getElementById("no-data-doughnut").classList.add("hidden");
-            
             chartDoughnutInstance = new Chart(document.getElementById('canvasDistribusiKategori'), {
                 type: 'doughnut',
-                data: {
-                    labels: katLabels,
-                    datasets: [{
-                        data: katData,
-                        backgroundColor: ['#4f46e5', '#10b981', '#f43f5e', '#f59e0b', '#06b6d4', '#8b5cf6', '#ec4899', '#64748b'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Plus Jakarta Sans', size: 11 } } } }
-                }
+                data: { labels: katLabels, datasets: [{ data: katData, backgroundColor: ['#4f46e5', '#10b981', '#f43f5e', '#f59e0b', '#06b6d4', '#8b5cf6', '#ec4899', '#64748b'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Plus Jakarta Sans', size: 11 } } } } }
             });
         } else {
             document.getElementById("canvasDistribusiKategori").classList.add("hidden");
@@ -1118,8 +1066,7 @@
         }
         
         const targetYear = filterT === "all" ? new Date().getFullYear().toString() : filterT;
-        const bulananIn = Array(12).fill(0);
-        const bulananOut = Array(12).fill(0);
+        const bulananIn = Array(12).fill(0); const bulananOut = Array(12).fill(0);
         
         globalTransactions.forEach(trx => {
             const targetDate = trx.tgl;
@@ -1130,10 +1077,8 @@
             if(date.getFullYear().toString() === targetYear) {
                 const matchPencatat = (filterP === "all" || (trx.pencatat || "").toString().toLowerCase() === filterP);
                 if(matchPencatat) {
-                    const m = date.getMonth();
-                    const n = parseFloat(trx.nominal) || 0;
+                    const m = date.getMonth(); const n = parseFloat(trx.nominal) || 0;
                     const jenis = (trx.jenis || "").toString().toLowerCase();
-
                     if(jenis === 'pemasukan') bulananIn[m] += n;
                     else if(jenis === 'pengeluaran') bulananOut[m] += n;
                 }
@@ -1144,27 +1089,14 @@
         if(chartTrendInstance) chartTrendInstance.destroy();
         chartTrendInstance = new Chart(document.getElementById('canvasTrenBulanan'), {
             type: 'bar',
-            data: {
-                labels: namaBulan,
-                datasets: [
-                    { label: 'Pemasukan', data: bulananIn, backgroundColor: 'rgba(16, 185, 129, 0.85)', borderRadius: 6 },
-                    { label: 'Pengeluaran', data: bulananOut, backgroundColor: 'rgba(244, 63, 94, 0.85)', borderRadius: 6 }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 10 } } } },
-                plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'Plus Jakarta Sans', size: 11 } } } }
-            }
+            data: { labels: namaBulan, datasets: [{ label: 'Pemasukan', data: bulananIn, backgroundColor: 'rgba(16, 185, 129, 0.85)', borderRadius: 6 }, { label: 'Pengeluaran', data: bulananOut, backgroundColor: 'rgba(244, 63, 94, 0.85)', borderRadius: 6 }] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 10 } } } }, plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'Plus Jakarta Sans', size: 11 } } } } }
         });
         
         const compSection = document.getElementById("admin-comparison-section");
         if(currentUser === "admin") {
             compSection.classList.remove("hidden");
-            
             const pencatatMap = {}; 
-            
             globalTransactions.forEach(trx => {
                 const targetDate = trx.tgl;
                 if(!targetDate) return;
@@ -1179,15 +1111,10 @@
                     const n = parseFloat(trx.nominal) || 0;
                     const jenis = (trx.jenis || "").toString().toLowerCase();
                     
-                    if(!pencatatMap[pencatat]) {
-                        pencatatMap[pencatat] = { in: 0, out: 0 };
-                    }
+                    if(!pencatatMap[pencatat]) pencatatMap[pencatat] = { in: 0, out: 0 };
                     
-                    if(jenis === "pemasukan") {
-                        pencatatMap[pencatat].in += n;
-                    } else if(jenis === "pengeluaran") {
-                        pencatatMap[pencatat].out += n;
-                    }
+                    if(jenis === "pemasukan") pencatatMap[pencatat].in += n;
+                    else if(jenis === "pengeluaran") pencatatMap[pencatat].out += n;
                 }
             });
             
@@ -1198,20 +1125,8 @@
             if(chartCompareInstance) chartCompareInstance.destroy();
             chartCompareInstance = new Chart(document.getElementById('canvasKomparasiPasangan'), {
                 type: 'bar',
-                data: {
-                    labels: compLabels,
-                    datasets: [
-                        { label: 'Pemasukan', data: dataIn, backgroundColor: '#10b981', borderRadius: 6 },
-                        { label: 'Pengeluaran', data: dataOut, backgroundColor: '#f43f5e', borderRadius: 6 }
-                    ]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { x: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, ticks: { font: { size: 10 } } }, y: { grid: { display: false }, ticks: { font: { fontStyle: 'bold' } } } },
-                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
-                }
+                data: { labels: compLabels, datasets: [{ label: 'Pemasukan', data: dataIn, backgroundColor: '#10b981', borderRadius: 6 }, { label: 'Pengeluaran', data: dataOut, backgroundColor: '#f43f5e', borderRadius: 6 }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, ticks: { font: { size: 10 } } }, y: { grid: { display: false }, ticks: { font: { fontStyle: 'bold' } } } }, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } } }
             });
         } else {
             compSection.classList.add("hidden");
