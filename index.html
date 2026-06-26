@@ -1085,7 +1085,7 @@
         const item = JSON.parse(decodeURIComponent(encodedItem));
         
         editMode = true; 
-        editRow = item._originalIndex; // Menggunakan index asli sebagai pengenal baris
+        editRow = item.row;
         
         document.getElementById('form-title').innerText = "Edit Transaksi";
         populateKategoriForm();
