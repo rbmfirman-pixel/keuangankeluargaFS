@@ -256,8 +256,8 @@
           <div>
             <label class="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 select-none">Jenis Transaksi</label>
             <div class="grid grid-cols-2 gap-3">
-              <button type="button" id="btn-jenis-masuk" onclick="setInputJenis('Pemasukan')" class="h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95">💰 Pemasukan</button>
-              <button type="button" id="btn-jenis-keluar" onclick="setInputJenis('Pengeluaran')" class="h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95">💸 Pengeluaran</button>
+              <button type="button" id="btn-jenis-masuk" onclick="setInputJenis('Pemasukan')" class="h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95">🤑 Pemasukan</button>
+              <button type="button" id="btn-jenis-keluar" onclick="setInputJenis('Pengeluaran')" class="h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95">😱 Pengeluaran</button>
             </div>
             <input type="hidden" id="in-jenis" required>
           </div>
@@ -517,7 +517,7 @@
         if(chartCompareInstance) chartCompareInstance.update();
     }
 
-    function togglePassword() { const p = document.getElementById("password"); const i = document.getElementById("eye-icon"); if(p.type === "password") { p.type = "text"; i.innerText = "🙈"; } else { p.type = "password"; i.innerText = "👁️"; } }
+    function togglePassword() { const p = document.getElementById("password"); const i = document.getElementById("eye-icon"); if(p.type === "password") { p.type = "text"; i.innerText = "🙊"; } else { p.type = "password"; i.innerText = "🙈"; } }
     
     function handleLogin(e) { 
         e.preventDefault(); 
@@ -784,8 +784,8 @@
                 </div>
                 
                 <div class="flex items-center gap-2 shrink-0">
-                    <button onclick="openEdit('${trxSafeStr}')" class="w-12 h-12 flex items-center justify-center bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/50 rounded-2xl active:scale-90 transition shadow-sm" title="Edit Data">✏️</button>
-                    <button onclick="openDelete(${trx.row})" class="w-12 h-12 flex items-center justify-center bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-200/50 dark:border-rose-900/50 rounded-2xl active:scale-90 transition shadow-sm" title="Hapus Data">🗑️</button>
+                    <button onclick="openEdit('${trxSafeStr}')" class="w-12 h-12 flex items-center justify-center bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/50 rounded-2xl active:scale-90 transition shadow-sm" title="Edit Data">🪶</button>
+                    <button onclick="openDelete(${trx.row})" class="w-12 h-12 flex items-center justify-center bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-200/50 dark:border-rose-900/50 rounded-2xl active:scale-90 transition shadow-sm" title="Hapus Data">🚫</button>
                 </div>
             </div>`;
         });
@@ -812,7 +812,7 @@
         editMode = true;
         editRow = item.row; 
         
-        document.getElementById("input-view-title").innerHTML = "<span>✏️</span> Edit Transaksi";
+        document.getElementById("input-view-title").innerHTML = "<span>🪶</span> Edit Transaksi";
         document.getElementById("btn-batal-edit").classList.remove("hidden");
         
         // Memasukkan Pencatat (Jika data lama tidak ada di dropdown, tambahkan sementara)
