@@ -857,13 +857,22 @@
         
         setInputJenis(item.jenis);
         
-        if(item.tgl) {
-            const d = new Date(item.tgl);
-            const y = d.getFullYear();
-            const m = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            document.getElementById("in-tgl").value = `${y}-${m}-${day}`;
-        }
+        if (item.tgl) {
+    // Cek apakah tanggal menggunakan format DD/MM/YYYY (ada garis miring)
+    if (item.tgl.includes('/')) {
+        const parts = item.tgl.split('/');
+        // parts[0] = DD, parts[1] = MM, parts[2] = YYYY
+        // Kita susun ulang jadi YYYY-MM-DD agar masuk ke input type="date"
+        document.getElementById("in-tgl").value = `${parts[2]}-${parts[1]}-${parts[0]}`;
+    } else {
+        // Fallback: Jika formatnya bukan DD/MM/YYYY (misal format lama/ISO)
+        const d = new Date(item.tgl);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        document.getElementById("in-tgl").value = `${y}-${m}-${day}`;
+    }
+}
         
         document.getElementById("in-kategori").value = item.kategori;
         document.getElementById("in-keterangan").value = item.keterangan;
@@ -911,14 +920,17 @@
         document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
         
         const payload = {
-            action: "saveTransaction",
-            mode: editMode ? "edit" : "add",
-            row: editRow,
-            pencatat: pencatat,
-            jenis: jenis,
-            tgl: document.getElementById("in-tgl").value,
-            kategori: document.getElementById("in-kategori").value,
-            keterangan: document.getElementById("in-keterangan").value,
+    action: "saveTransaction",
+    mode: editMode ? "edit" : "add",
+    row: editRow,
+    pencatat: pencatat,
+    jenis: jenis,
+    tgl: formatTanggalManual(document.getElementById("in-tgl").value), // <--- SEKARANG FORMATNYA DD/MM/YYYY
+    kategori: document.getElementById("in-kategori").value,
+    keterangan: document.getElementById("in-keterangan").value,
+    nominal: kembalikanKeAngka(document.getElementById("in-nominal").value),
+    user: localStorage.getItem("fw_user") || "Guest"
+};
             
             // PENTING: Kembalikan string "50.000" menjadi angka murni "50000" sebelum simpan
             nominal: kembalikanKeAngka(document.getElementById("in-nominal").value),
@@ -1168,7 +1180,13 @@
             compSection.classList.add("hidden");
         }
     }
-
+// Fungsi untuk merubah format YYYY-MM-DD ke DD/MM/YYYY
+function formatTanggalManual(dateString) {
+    if (!dateString) return "";
+    // dateString dari input type="date" selalu YYYY-MM-DD
+    const [y, m, d] = dateString.split('-');
+    return `${d}/${m}/${y}`;
+}
     window.onload = () => {
         initTheme(); 
         if(localStorage.getItem("fw_user")) {
