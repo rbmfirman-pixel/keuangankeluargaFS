@@ -75,7 +75,12 @@
         background: radial-gradient(circle, rgba(49,151,149,0.3) 0%, rgba(255,255,255,0) 70%);
         filter: blur(50px); z-index: -1; pointer-events: none;
     }
-    html.mint header { background: transparent !important; }
+    html.mint header { 
+        background: rgba(255, 255, 255, 0.45) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
+    }
     html.mint .card {
         background: rgba(255, 255, 255, 0.45) !important;
         backdrop-filter: blur(20px) !important;
@@ -116,6 +121,10 @@
     html.mint.dark body {
         background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%) !important;
         color: #f8fafc !important;
+    }
+    html.mint.dark header {
+        background: rgba(30, 41, 59, 0.45) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
     }
     html.mint.dark body::before { background: radial-gradient(circle, rgba(20,184,166,0.15) 0%, rgba(255,255,255,0) 70%); }
     html.mint.dark body::after { background: radial-gradient(circle, rgba(13,148,136,0.15) 0%, rgba(255,255,255,0) 70%); }
@@ -172,8 +181,8 @@
     </div>
   </div>
 
-  <div id="app-section" class="hidden max-w-lg mx-auto fade-in">
-    <header class="p-6 flex justify-between items-center bg-[#f8fafc] dark:bg-slate-900 sticky top-0 z-30 select-none transition-colors duration-300">
+  <div id="app-section" class="hidden max-w-lg mx-auto fade-in pt-24">
+    <header class="fixed top-0 left-0 right-0 max-w-lg mx-auto w-full p-6 flex justify-between items-center bg-[#f8fafc]/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50 z-40 select-none transition-colors duration-300">
       <h2 id="header-title" class="font-bold text-xl text-slate-800 dark:text-slate-100">Dashboard</h2>
     </header>
 
@@ -283,7 +292,7 @@
             <label class="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 select-none">Nominal Rupiah</label>
             <div class="relative">
               <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-sm select-none">Rp</span>
-              <input type="number" id="in-nominal" placeholder="0" min="1" required class="shadow-sm" style="padding-left: 42px !important;">
+              <input type="text" id="in-nominal" placeholder="0" required class="shadow-sm" style="padding-left: 42px !important;" onkeyup="formatInputRupiah(this)">
             </div>
           </div>
 
@@ -437,6 +446,37 @@
     let editRow = null;
     
     const formatter = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 });
+
+    /* =======================================
+       FUNGSI BARU: FORMAT RUPIAH OTOMATIS
+       ======================================= */
+    function formatInputRupiah(input) {
+        // Hapus karakter selain angka
+        let value = input.value.replace(/[^,\d]/g, ''); 
+        input.value = formatRupiah(value);
+    }
+
+    function formatRupiah(angka) {
+        let number_string = angka.toString().replace(/[^,\d]/g, '');
+        let split = number_string.split(',');
+        let sisa = split[0].length % 3;
+        let rupiah = split[0].substr(0, sisa);
+        let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        if (ribuan) {
+            let separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        return split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+    }
+
+    // Fungsi untuk mengembalikan format Rupiah menjadi Integer agar bisa disimpan di Sheet
+    function kembalikanKeAngka(stringRupiah) {
+        if (!stringRupiah) return 0;
+        return parseInt(stringRupiah.toString().replace(/[^0-9]/g, ''), 10) || 0;
+    }
+    /* ======================================= */
 
     function initTheme() {
         const savedTheme = localStorage.getItem('fw_theme') || 'auto';
@@ -602,12 +642,11 @@
                 });
             }
 
-            // 2. MENGISI DROPDOWN PENCATAT (INPUT & FILTER) BERDASARKAN DATA DARI SHEET AKUN
+            // 2. MENGISI DROPDOWN PENCATAT
             const inPencatat = document.getElementById("in-pencatat");
             const filterPencatat = document.getElementById("filter-pencatat");
             
             if(res.users) {
-                // Untuk Form Input
                 if(inPencatat) {
                     inPencatat.innerHTML = '<option value="" disabled selected>Pilih Pencatat</option>';
                     res.users.forEach(u => {
@@ -616,7 +655,6 @@
                     });
                 }
                 
-                // Untuk Filter Dashboard (Bagi Admin, berikan opsi semua orang)
                 const userLogin = localStorage.getItem("fw_user") || "";
                 if(filterPencatat && userLogin.toLowerCase() === "admin") {
                     filterPencatat.innerHTML = '<option value="all">Semua Orang</option>';
@@ -638,28 +676,24 @@
                 const capUser = user.charAt(0).toUpperCase() + user.slice(1).toLowerCase();
                 
                 if (user && user.toLowerCase() !== "admin") {
-                    // USER BIASA: Kunci Dashboard ke namanya
                     filterPencatat.innerHTML = `<option value="${capUser}">${capUser}</option>`;
                     filterPencatat.value = capUser;
                     filterPencatat.disabled = true;
                     filterPencatat.classList.add("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
                     
-                    // USER BIASA: Kunci Form Input ke namanya
                     if(inPencatat) {
-                        // Pastikan opsinya ada
                         if(!Array.from(inPencatat.options).some(opt => opt.value === capUser)) {
                             let opt = document.createElement("option"); opt.value = capUser; opt.text = capUser;
                             inPencatat.appendChild(opt);
                         }
                         inPencatat.value = capUser;
-                        inPencatat.disabled = true; // Kunci permanen untuk User
+                        inPencatat.disabled = true;
                     }
                 } else {
-                    // ADMIN: Bebas Memilih
                     filterPencatat.disabled = false;
                     filterPencatat.classList.remove("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
                     if(inPencatat) {
-                        inPencatat.disabled = false; // Buka kunci untuk Admin
+                        inPencatat.disabled = false;
                     }
                 }
             }
@@ -759,11 +793,11 @@
         filtered.forEach(trx => {
             const isPengeluaran = (trx.jenis || "").toString().toLowerCase() === 'pengeluaran';
             const pencatatText = trx.pencatat ? trx.pencatat.toString() : '?';
-            // Styling Badge Dinamis (Akan acak pastel untuk nama baru, fix untuk suami/istri)
+            
             let badgeColor = 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300';
             if(pencatatText.toLowerCase() === 'suami') badgeColor = 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400';
             else if(pencatatText.toLowerCase() === 'istri') badgeColor = 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400';
-            else badgeColor = 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400'; // Default warna lain
+            else badgeColor = 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400';
 
             const dateDisplay = new Date(trx.tgl).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
             const trxSafeStr = encodeURIComponent(JSON.stringify(trx));
@@ -792,7 +826,6 @@
         document.getElementById("list-riwayat-lengkap").innerHTML = html || '<div class="text-center py-10 select-none"><p class="text-sm text-slate-500 dark:text-slate-400">Tidak ada transaksi.</p></div>';
     }
 
-    // Interaksi Tombol Pemasukan/Pengeluaran
     function setInputJenis(val) {
         document.getElementById("in-jenis").value = val;
         const btnMasuk = document.getElementById("btn-jenis-masuk");
@@ -815,7 +848,6 @@
         document.getElementById("input-view-title").innerHTML = "<span>🪶</span> Edit Transaksi";
         document.getElementById("btn-batal-edit").classList.remove("hidden");
         
-        // Memasukkan Pencatat (Jika data lama tidak ada di dropdown, tambahkan sementara)
         const inPencatat = document.getElementById("in-pencatat");
         if(inPencatat && !Array.from(inPencatat.options).some(opt => opt.value === item.pencatat)) {
             let opt = document.createElement("option"); opt.value = item.pencatat; opt.text = item.pencatat;
@@ -835,7 +867,9 @@
         
         document.getElementById("in-kategori").value = item.kategori;
         document.getElementById("in-keterangan").value = item.keterangan;
-        document.getElementById("in-nominal").value = item.nominal;
+        
+        // PENTING: Tambahkan format saat edit data
+        document.getElementById("in-nominal").value = formatRupiah(item.nominal.toString());
         
         switchTab('input');
     }
@@ -848,7 +882,7 @@
     function resetInputForm() {
         editMode = false;
         editRow = null;
-        document.getElementById("input-view-title").innerHTML = "<span🪶</span> Input Transaksi";
+        document.getElementById("input-view-title").innerHTML = "<span>🪶</span> Input Transaksi";
         document.getElementById("btn-batal-edit").classList.add("hidden");
         document.getElementById("form-transaksi").reset();
         
@@ -856,7 +890,6 @@
         document.getElementById("btn-jenis-masuk").className = "h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95";
         document.getElementById("btn-jenis-keluar").className = "h-12 font-bold rounded-2xl transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 active:scale-95";
 
-        // Reset Dropdown Pencatat ke Akun yang Login
         const user = localStorage.getItem("fw_user") || "";
         const inPencatat = document.getElementById("in-pencatat");
         if (user && user.toLowerCase() !== "admin") {
@@ -886,7 +919,10 @@
             tgl: document.getElementById("in-tgl").value,
             kategori: document.getElementById("in-kategori").value,
             keterangan: document.getElementById("in-keterangan").value,
-            nominal: parseFloat(document.getElementById("in-nominal").value),
+            
+            // PENTING: Kembalikan string "50.000" menjadi angka murni "50000" sebelum simpan
+            nominal: kembalikanKeAngka(document.getElementById("in-nominal").value),
+            
             user: localStorage.getItem("fw_user") || "Guest"
         };
         
