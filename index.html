@@ -671,32 +671,34 @@
                 document.getElementById("filter-bulan").value = curM;
                 document.getElementById("filter-riwayat-bulan").value = curM;
                 document.getElementById("filter-laporan-bulan").value = curM;
+            }
+
+            // Pindahkan logika ini keluar dari if(!isReload) agar selalu dijalankan
+            const user = localStorage.getItem("fw_user") || "";
+            const capUser = user.charAt(0).toUpperCase() + user.slice(1).toLowerCase();
+            
+            if (user && user.toLowerCase() !== "admin") {
+                filterPencatat.innerHTML = `<option value="${capUser}">${capUser}</option>`;
+                filterPencatat.value = capUser;
+                filterPencatat.disabled = true;
+                filterPencatat.classList.add("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
                 
-                const user = localStorage.getItem("fw_user") || "";
-                const capUser = user.charAt(0).toUpperCase() + user.slice(1).toLowerCase();
-                
-                if (user && user.toLowerCase() !== "admin") {
-                    filterPencatat.innerHTML = `<option value="${capUser}">${capUser}</option>`;
-                    filterPencatat.value = capUser;
-                    filterPencatat.disabled = true;
-                    filterPencatat.classList.add("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
-                    
-                    if(inPencatat) {
-                        if(!Array.from(inPencatat.options).some(opt => opt.value === capUser)) {
-                            let opt = document.createElement("option"); opt.value = capUser; opt.text = capUser;
-                            inPencatat.appendChild(opt);
-                        }
-                        inPencatat.value = capUser;
-                        inPencatat.disabled = true;
+                if(inPencatat) {
+                    if(!Array.from(inPencatat.options).some(opt => opt.value === capUser)) {
+                        let opt = document.createElement("option"); opt.value = capUser; opt.text = capUser;
+                        inPencatat.appendChild(opt);
                     }
-                } else {
-                    filterPencatat.disabled = false;
-                    filterPencatat.classList.remove("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
-                    if(inPencatat) {
-                        inPencatat.disabled = false;
-                    }
+                    inPencatat.value = capUser;
+                    inPencatat.disabled = true;
+                }
+            } else {
+                filterPencatat.disabled = false;
+                filterPencatat.classList.remove("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
+                if(inPencatat) {
+                    inPencatat.disabled = false;
                 }
             }
+            
             initRiwayatFilters(); 
             renderFilteredData(); 
             refreshActiveTab();
