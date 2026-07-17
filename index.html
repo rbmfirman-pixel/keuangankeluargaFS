@@ -227,7 +227,8 @@
     <main id="view-riwayat" class="hidden px-6 space-y-4 fade-in">
       <div class="relative">
         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-base select-none z-10 flex items-center justify-center">🔍</span>
-        <input type="text" id="search-riwayat" placeholder="Cari kategori atau keterangan..." oninput="renderRiwayatLengkap()" class="bg-white border-none shadow-sm" style="padding-left: 44px !important;">
+        <!-- Diperbarui: oninput menggunakan fungsi debounce -->
+        <input type="text" id="search-riwayat" placeholder="Cari kategori atau keterangan..." oninput="debounceSearchRiwayat()" class="bg-white border-none shadow-sm" style="padding-left: 44px !important;">
       </div>
 
       <div class="grid grid-cols-2 gap-4">
@@ -448,10 +449,20 @@
     const formatter = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 });
 
     /* =======================================
+       FUNGSI BARU: DEBOUNCE UNTUK PENCARIAN
+       ======================================= */
+    let searchTimeout;
+    function debounceSearchRiwayat() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            renderRiwayatLengkap();
+        }, 300);
+    }
+
+    /* =======================================
        FUNGSI BARU: FORMAT RUPIAH OTOMATIS
        ======================================= */
     function formatInputRupiah(input) {
-        // Hapus karakter selain angka
         let value = input.value.replace(/[^,\d]/g, ''); 
         input.value = formatRupiah(value);
     }
@@ -471,7 +482,6 @@
         return split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
     }
 
-    // Fungsi untuk mengembalikan format Rupiah menjadi Integer agar bisa disimpan di Sheet
     function kembalikanKeAngka(stringRupiah) {
         if (!stringRupiah) return 0;
         return parseInt(stringRupiah.toString().replace(/[^0-9]/g, ''), 10) || 0;
@@ -622,86 +632,33 @@
         if(!document.getElementById("view-laporan").classList.contains("hidden")) renderLaporanKeuangan();
     }
 
+    /* =======================================
+       DIPERBARUI: LOGIKA LOAD & CACHE DATA
+       ======================================= */
     function loadDataFromServer(isReload = false) {
-      document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
+      if (!isReload) {
+          const cachedData = localStorage.getItem("fw_data_cache");
+          if (cachedData) {
+              try {
+                  const res = JSON.parse(cachedData);
+                  processDataResponse(res, false);
+              } catch (e) {
+                  console.error("Cache rusak, memuat ulang...");
+                  document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
+              }
+          } else {
+              document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
+          }
+      } else {
+          document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
+      }
       
       fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "getTransactions" }) })
       .then(response => response.json())
       .then(res => { 
         if(res.status === "success") {
-            globalTransactions = res.data;
-            globalTransactions.forEach((trx, index) => { trx._originalIndex = index; });
-
-            // 1. MENGISI DROPDOWN KATEGORI
-            const inKategori = document.getElementById("in-kategori");
-            if(inKategori && res.categories) {
-                inKategori.innerHTML = '<option value="" disabled selected>Pilih Kategori</option>';
-                res.categories.forEach(kat => {
-                    let opt = document.createElement("option"); opt.value = kat; opt.text = kat;
-                    inKategori.appendChild(opt);
-                });
-            }
-
-            // 2. MENGISI DROPDOWN PENCATAT
-            const inPencatat = document.getElementById("in-pencatat");
-            const filterPencatat = document.getElementById("filter-pencatat");
-            
-            if(res.users) {
-                if(inPencatat) {
-                    inPencatat.innerHTML = '<option value="" disabled selected>Pilih Pencatat</option>';
-                    res.users.forEach(u => {
-                        let opt = document.createElement("option"); opt.value = u; opt.text = u;
-                        inPencatat.appendChild(opt);
-                    });
-                }
-                
-                const userLogin = localStorage.getItem("fw_user") || "";
-                if(filterPencatat && userLogin.toLowerCase() === "admin") {
-                    filterPencatat.innerHTML = '<option value="all">Semua Orang</option>';
-                    res.users.forEach(u => {
-                        let opt = document.createElement("option"); opt.value = u; opt.text = u;
-                        filterPencatat.appendChild(opt);
-                    });
-                }
-            }
-
-            // 3. LOGIKA KUNCI OTOMATIS BERDASARKAN AKUN LOGIN
-            if(!isReload) {
-                const curM = new Date().getMonth().toString();
-                document.getElementById("filter-bulan").value = curM;
-                document.getElementById("filter-riwayat-bulan").value = curM;
-                document.getElementById("filter-laporan-bulan").value = curM;
-            }
-
-            // Pindahkan logika ini keluar dari if(!isReload) agar selalu dijalankan
-            const user = localStorage.getItem("fw_user") || "";
-            const capUser = user.charAt(0).toUpperCase() + user.slice(1).toLowerCase();
-            
-            if (user && user.toLowerCase() !== "admin") {
-                filterPencatat.innerHTML = `<option value="${capUser}">${capUser}</option>`;
-                filterPencatat.value = capUser;
-                filterPencatat.disabled = true;
-                filterPencatat.classList.add("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
-                
-                if(inPencatat) {
-                    if(!Array.from(inPencatat.options).some(opt => opt.value === capUser)) {
-                        let opt = document.createElement("option"); opt.value = capUser; opt.text = capUser;
-                        inPencatat.appendChild(opt);
-                    }
-                    inPencatat.value = capUser;
-                    inPencatat.disabled = true;
-                }
-            } else {
-                filterPencatat.disabled = false;
-                filterPencatat.classList.remove("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
-                if(inPencatat) {
-                    inPencatat.disabled = false;
-                }
-            }
-            
-            initRiwayatFilters(); 
-            renderFilteredData(); 
-            refreshActiveTab();
+            localStorage.setItem("fw_data_cache", JSON.stringify(res));
+            processDataResponse(res, isReload);
         } else { 
             alert("Gagal memuat data: " + res.message); 
         }
@@ -709,8 +666,85 @@
       }).catch(err => { 
           console.error("Fetch Error:", err);
           document.getElementById("loader").classList.add("opacity-0", "pointer-events-none"); 
-          alert("Gagal mengambil data dari Google Sheet. Periksa koneksi internet Anda."); 
+          if(isReload || !localStorage.getItem("fw_data_cache")) {
+              alert("Gagal mengambil data dari Google Sheet. Periksa koneksi internet Anda."); 
+          }
       });
+    }
+
+    function processDataResponse(res, isReload) {
+        globalTransactions = res.data;
+        globalTransactions.forEach((trx, index) => { trx._originalIndex = index; });
+
+        // 1. MENGISI DROPDOWN KATEGORI
+        const inKategori = document.getElementById("in-kategori");
+        if(inKategori && res.categories) {
+            inKategori.innerHTML = '<option value="" disabled selected>Pilih Kategori</option>';
+            res.categories.forEach(kat => {
+                let opt = document.createElement("option"); opt.value = kat; opt.text = kat;
+                inKategori.appendChild(opt);
+            });
+        }
+
+        // 2. MENGISI DROPDOWN PENCATAT
+        const inPencatat = document.getElementById("in-pencatat");
+        const filterPencatat = document.getElementById("filter-pencatat");
+        
+        if(res.users) {
+            if(inPencatat) {
+                inPencatat.innerHTML = '<option value="" disabled selected>Pilih Pencatat</option>';
+                res.users.forEach(u => {
+                    let opt = document.createElement("option"); opt.value = u; opt.text = u;
+                    inPencatat.appendChild(opt);
+                });
+            }
+            
+            const userLogin = localStorage.getItem("fw_user") || "";
+            if(filterPencatat && userLogin.toLowerCase() === "admin") {
+                filterPencatat.innerHTML = '<option value="all">Semua Orang</option>';
+                res.users.forEach(u => {
+                    let opt = document.createElement("option"); opt.value = u; opt.text = u;
+                    filterPencatat.appendChild(opt);
+                });
+            }
+        }
+
+        // 3. LOGIKA KUNCI OTOMATIS BERDASARKAN AKUN LOGIN
+        if(!isReload) {
+            const curM = new Date().getMonth().toString();
+            document.getElementById("filter-bulan").value = curM;
+            document.getElementById("filter-riwayat-bulan").value = curM;
+            document.getElementById("filter-laporan-bulan").value = curM;
+        }
+
+        const user = localStorage.getItem("fw_user") || "";
+        const capUser = user.charAt(0).toUpperCase() + user.slice(1).toLowerCase();
+        
+        if (user && user.toLowerCase() !== "admin") {
+            filterPencatat.innerHTML = `<option value="${capUser}">${capUser}</option>`;
+            filterPencatat.value = capUser;
+            filterPencatat.disabled = true;
+            filterPencatat.classList.add("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
+            
+            if(inPencatat) {
+                if(!Array.from(inPencatat.options).some(opt => opt.value === capUser)) {
+                    let opt = document.createElement("option"); opt.value = capUser; opt.text = capUser;
+                    inPencatat.appendChild(opt);
+                }
+                inPencatat.value = capUser;
+                inPencatat.disabled = true;
+            }
+        } else {
+            filterPencatat.disabled = false;
+            filterPencatat.classList.remove("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
+            if(inPencatat) {
+                inPencatat.disabled = false;
+            }
+        }
+        
+        initRiwayatFilters(); 
+        renderFilteredData(); 
+        refreshActiveTab();
     }
 
     function initRiwayatFilters() {
@@ -791,8 +825,13 @@
             return (b._originalIndex || 0) - (a._originalIndex || 0);
         });
 
+        /* =======================================
+           DIPERBARUI: LIMITASI DATA RENDER
+           ======================================= */
+        const limitedData = filtered.slice(0, 50);
+
         let html = "";
-        filtered.forEach(trx => {
+        limitedData.forEach(trx => {
             const isPengeluaran = (trx.jenis || "").toString().toLowerCase() === 'pengeluaran';
             const pencatatText = trx.pencatat ? trx.pencatat.toString() : '?';
             
@@ -825,6 +864,11 @@
                 </div>
             </div>`;
         });
+        
+        if(filtered.length > 50) {
+            html += `<div class="text-center pt-2 pb-4 select-none"><p class="text-xs text-slate-400 dark:text-slate-500">Menampilkan 50 data terbaru. Gunakan filter untuk mencari data lama.</p></div>`;
+        }
+        
         document.getElementById("list-riwayat-lengkap").innerHTML = html || '<div class="text-center py-10 select-none"><p class="text-sm text-slate-500 dark:text-slate-400">Tidak ada transaksi.</p></div>';
     }
 
@@ -870,7 +914,6 @@
         document.getElementById("in-kategori").value = item.kategori;
         document.getElementById("in-keterangan").value = item.keterangan;
         
-        // PENTING: Tambahkan format saat edit data
         document.getElementById("in-nominal").value = formatRupiah(item.nominal.toString());
         
         switchTab('input');
@@ -921,10 +964,7 @@
             tgl: document.getElementById("in-tgl").value,
             kategori: document.getElementById("in-kategori").value,
             keterangan: document.getElementById("in-keterangan").value,
-            
-            // PENTING: Kembalikan string "50.000" menjadi angka murni "50000" sebelum simpan
             nominal: kembalikanKeAngka(document.getElementById("in-nominal").value),
-            
             user: localStorage.getItem("fw_user") || "Guest"
         };
         
