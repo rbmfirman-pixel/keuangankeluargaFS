@@ -227,22 +227,21 @@
     <main id="view-riwayat" class="hidden px-6 space-y-4 fade-in">
       <div class="relative">
         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-base select-none z-10 flex items-center justify-center">🔍</span>
-        <!-- Diperbarui: oninput menggunakan fungsi debounce -->
         <input type="text" id="search-riwayat" placeholder="Cari kategori atau keterangan..." oninput="debounceSearchRiwayat()" class="bg-white border-none shadow-sm" style="padding-left: 44px !important;">
       </div>
 
       <div class="grid grid-cols-2 gap-4">
-        <select id="filter-riwayat-bulan" onchange="renderRiwayatLengkap()" class="border-none shadow-sm cursor-pointer">
+        <select id="filter-riwayat-bulan" onchange="resetRiwayatLimitAndRender()" class="border-none shadow-sm cursor-pointer">
           <option value="all">Semua Bulan</option>
           <option value="0">Januari</option><option value="1">Februari</option><option value="2">Maret</option>
           <option value="3">April</option><option value="4">Mei</option><option value="5">Juni</option>
           <option value="6">Juli</option><option value="7">Agustus</option><option value="8">September</option>
           <option value="9">Oktober</option><option value="10">November</option><option value="11">Desember</option>
         </select>
-        <select id="filter-riwayat-tahun" onchange="renderRiwayatLengkap()" class="border-none shadow-sm cursor-pointer"><option value="all">Semua Tahun</option></select>
+        <select id="filter-riwayat-tahun" onchange="resetRiwayatLimitAndRender()" class="border-none shadow-sm cursor-pointer"><option value="all">Semua Tahun</option></select>
       </div>
 
-      <select id="filter-riwayat-kategori" onchange="renderRiwayatLengkap()" class="border-none shadow-sm w-full cursor-pointer">
+      <select id="filter-riwayat-kategori" onchange="resetRiwayatLimitAndRender()" class="border-none shadow-sm w-full cursor-pointer">
         <option value="all">Semua Kategori</option>
       </select>
 
@@ -442,6 +441,9 @@
     let chartTrendInstance = null;
     let chartCompareInstance = null;
     
+    // Pagination / Limit State
+    let currentRiwayatLimit = 50;
+    
     // Status Form Input & Edit Global
     let editMode = false;
     let editRow = null;
@@ -455,8 +457,22 @@
     function debounceSearchRiwayat() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
+            currentRiwayatLimit = 50; // Reset limit saat mencari
             renderRiwayatLengkap();
         }, 300);
+    }
+
+    /* =======================================
+       FUNGSI BARU: RESET LIMIT & LOAD MORE (PAGINATION)
+       ======================================= */
+    function resetRiwayatLimitAndRender() {
+        currentRiwayatLimit = 50;
+        renderRiwayatLengkap();
+    }
+    
+    function loadMoreRiwayat() {
+        currentRiwayatLimit += 50;
+        renderRiwayatLengkap();
     }
 
     /* =======================================
@@ -618,7 +634,10 @@
         
         document.getElementById("header-title").innerText = titles[tab] || "FamilyWealth";
         
-        if(tab === 'riwayat') renderRiwayatLengkap();
+        if(tab === 'riwayat') {
+            currentRiwayatLimit = 50; // Reset pagination ke 50 setiap pindah ke tab riwayat
+            renderRiwayatLengkap();
+        }
         if(tab === 'laporan') renderLaporanKeuangan();
         if(tab === 'settings') {
             const user = localStorage.getItem("fw_user") || "Guest";
@@ -826,9 +845,9 @@
         });
 
         /* =======================================
-           DIPERBARUI: LIMITASI DATA RENDER
+           DIPERBARUI: LIMITASI DATA RENDER & PAGINATION
            ======================================= */
-        const limitedData = filtered.slice(0, 50);
+        const limitedData = filtered.slice(0, currentRiwayatLimit);
 
         let html = "";
         limitedData.forEach(trx => {
@@ -865,8 +884,14 @@
             </div>`;
         });
         
-        if(filtered.length > 50) {
-            html += `<div class="text-center pt-2 pb-4 select-none"><p class="text-xs text-slate-400 dark:text-slate-500">Menampilkan 50 data terbaru. Gunakan filter untuk mencari data lama.</p></div>`;
+        // Menampilkan tombol Muat Lebih Banyak jika data masih ada
+        if(filtered.length > currentRiwayatLimit) {
+            html += `<div class="text-center pt-2 pb-4 select-none">
+                <button onclick="loadMoreRiwayat()" class="px-6 py-2.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 font-bold rounded-xl active:scale-95 transition-all text-sm shadow-sm border border-indigo-200 dark:border-indigo-800/50">Muat Lebih Banyak ↓</button>
+                <p class="text-xs text-slate-400 dark:text-slate-500 mt-3">Menampilkan ${currentRiwayatLimit} dari ${filtered.length} transaksi.</p>
+            </div>`;
+        } else if (filtered.length > 0) {
+            html += `<div class="text-center pt-2 pb-4 select-none"><p class="text-xs text-slate-400 dark:text-slate-500">Semua data telah dimuat (${filtered.length} transaksi).</p></div>`;
         }
         
         document.getElementById("list-riwayat-lengkap").innerHTML = html || '<div class="text-center py-10 select-none"><p class="text-sm text-slate-500 dark:text-slate-400">Tidak ada transaksi.</p></div>';
