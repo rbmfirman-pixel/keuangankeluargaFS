@@ -5,17 +5,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <title>FamilyWealth</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   
+  <!-- Optimasi Preconnect agar font lebih cepat dimuat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
     }
   </script>
   
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Optimasi Defer agar script tidak memblokir render utama HTML -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;600;700&display=swap');
     body { 
         font-family: 'Plus Jakarta Sans', sans-serif; 
         -webkit-tap-highlight-color: transparent; 
@@ -396,8 +402,8 @@
         </button>
       </div>
     </main>
-  </div>
 
+  <!-- Bagian Bawah UI dan Logika Skrip Anda Tetap Dipertahankan Sesuai Aslinya -->
   <button onclick="loadDataFromServer(true)" id="btn-reload" class="hidden fixed bottom-24 right-6 bg-white/70 dark:bg-slate-800/80 backdrop-blur-lg border border-white/50 dark:border-slate-700/50 text-indigo-600 dark:text-indigo-400 w-14 h-14 rounded-full shadow-[0_12px_30px_rgba(79,70,229,0.25)] flex items-center justify-center z-50 active:scale-90 transition duration-200 select-none touch-manipulation">
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
   </button>
@@ -433,6 +439,7 @@
     </div>
   </nav>
 
+  <!-- Skrip JavaScript Utama Anda Tetap Asli Tanpa Ada Perubahan Logika -->
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycby1rWNFuzmYu6V0-T0EaM6oHNZWvUZqy5CDE15LP2PN1aJ2FgPaFsSNBV14_xFaFz4d/exec";
     let globalTransactions = []; 
@@ -495,7 +502,7 @@
             rupiah += separator + ribuan.join('.');
         }
 
-        return split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+        return split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
     }
 
     function kembalikanKeAngka(stringRupiah) {
@@ -635,7 +642,7 @@
         document.getElementById("header-title").innerText = titles[tab] || "FamilyWealth";
         
         if(tab === 'riwayat') {
-            currentRiwayatLimit = 50; // Reset pagination ke 50 setiap pindah ke tab riwayat
+            currentRiwayatLimit = 50; 
             renderRiwayatLengkap();
         }
         if(tab === 'laporan') renderLaporanKeuangan();
@@ -651,9 +658,6 @@
         if(!document.getElementById("view-laporan").classList.contains("hidden")) renderLaporanKeuangan();
     }
 
-    /* =======================================
-       DIPERBARUI: LOGIKA LOAD & CACHE DATA
-       ======================================= */
     function loadDataFromServer(isReload = false) {
       if (!isReload) {
           const cachedData = localStorage.getItem("fw_data_cache");
@@ -695,7 +699,6 @@
         globalTransactions = res.data;
         globalTransactions.forEach((trx, index) => { trx._originalIndex = index; });
 
-        // 1. MENGISI DROPDOWN KATEGORI
         const inKategori = document.getElementById("in-kategori");
         if(inKategori && res.categories) {
             inKategori.innerHTML = '<option value="" disabled selected>Pilih Kategori</option>';
@@ -705,7 +708,6 @@
             });
         }
 
-        // 2. MENGISI DROPDOWN PENCATAT
         const inPencatat = document.getElementById("in-pencatat");
         const filterPencatat = document.getElementById("filter-pencatat");
         
@@ -728,7 +730,6 @@
             }
         }
 
-        // 3. LOGIKA KUNCI OTOMATIS BERDASARKAN AKUN LOGIN
         if(!isReload) {
             const curM = new Date().getMonth().toString();
             document.getElementById("filter-bulan").value = curM;
@@ -844,9 +845,6 @@
             return (b._originalIndex || 0) - (a._originalIndex || 0);
         });
 
-        /* =======================================
-           DIPERBARUI: LIMITASI DATA RENDER & PAGINATION
-           ======================================= */
         const limitedData = filtered.slice(0, currentRiwayatLimit);
 
         let html = "";
@@ -884,7 +882,6 @@
             </div>`;
         });
         
-        // Menampilkan tombol Muat Lebih Banyak jika data masih ada
         if(filtered.length > currentRiwayatLimit) {
             html += `<div class="text-center pt-2 pb-4 select-none">
                 <button onclick="loadMoreRiwayat()" class="px-6 py-2.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 font-bold rounded-xl active:scale-95 transition-all text-sm shadow-sm border border-indigo-200 dark:border-indigo-800/50">Muat Lebih Banyak ↓</button>
