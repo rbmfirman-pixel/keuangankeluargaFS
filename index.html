@@ -213,7 +213,7 @@
 
       <div class="grid grid-cols-2 gap-4 select-none">
         <div class="card p-5">
-          <p class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Saldo Awal</p>
+          <p class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">PEMASUKAN</p>
           <p id="txt-saldo-awal" class="text-sm font-bold mt-1 text-slate-700 dark:text-slate-200">Rp 0</p>
         </div>
         <div class="card p-5">
@@ -1056,9 +1056,11 @@
         }
       });
       
-      document.getElementById("txt-saldo-awal").innerText = formatter.format(filterB === "all" ? totalP : saldoAwal);
-      document.getElementById("txt-pengeluaran").innerText = formatter.format(totalK);
-      document.getElementById("txt-saldo").innerText = formatter.format((filterB === "all" ? totalP : saldoAwal) + totalP - totalK);
+      // Tambahkan (saldoAwal + totalP) agar Sisa Bulan Lalu digabung dengan Pemasukan Bulan Ini
+document.getElementById("txt-saldo-awal").innerText = formatter.format(filterB === "all" ? totalP : (saldoAwal + totalP));
+
+document.getElementById("txt-pengeluaran").innerText = formatter.format(totalK);
+document.getElementById("txt-saldo").innerText = formatter.format((filterB === "all" ? totalP : saldoAwal) + totalP - totalK);
       
       let html = "";
       globalTransactions.filter(t => {
