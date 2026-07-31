@@ -206,19 +206,28 @@
         </select>
       </div>
 
-      <div class="bg-indigo-600 dark:bg-indigo-500 text-white p-7 rounded-3xl shadow-lg shadow-indigo-200 dark:shadow-none select-none transition-colors">
-        <p class="text-indigo-200 dark:text-indigo-100 text-[11px] uppercase tracking-widest font-bold">Total Sisa Saldo</p>
-        <h1 id="txt-saldo" class="text-3xl font-bold mt-1">Rp 0</h1>
+      <!-- Upgrade UI: Tombol Show/Hide Saldo -->
+      <div class="bg-indigo-600 dark:bg-indigo-500 text-white p-7 rounded-3xl shadow-lg shadow-indigo-200 dark:shadow-none select-none transition-colors relative">
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-indigo-200 dark:text-indigo-100 text-[11px] uppercase tracking-widest font-bold">Total Sisa Saldo</p>
+                <h1 id="txt-saldo" data-value="0" class="text-3xl font-bold mt-1">Rp 0</h1>
+            </div>
+            <!-- Tombol Toggle Sentuh -->
+            <button id="btn-toggle-saldo" onclick="toggleSaldoVisibility()" class="w-12 h-12 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center transition active:scale-90 text-xl border border-white/30 shadow-sm touch-manipulation z-10" title="Sembunyikan/Tampilkan Saldo">
+                👁️
+            </button>
+        </div>
       </div>
 
       <div class="grid grid-cols-2 gap-4 select-none">
         <div class="card p-5">
-          <p class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">PEMASUKAN</p>
-          <p id="txt-saldo-awal" class="text-sm font-bold mt-1 text-slate-700 dark:text-slate-200">Rp 0</p>
+          <p class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Pemasukan</p>
+          <p id="txt-saldo-awal" data-value="0" class="text-sm font-bold mt-1 text-slate-700 dark:text-slate-200">Rp 0</p>
         </div>
         <div class="card p-5">
           <p class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Pengeluaran</p>
-          <p id="txt-pengeluaran" class="text-sm font-bold mt-1 text-rose-500 dark:text-rose-400">Rp 0</p>
+          <p id="txt-pengeluaran" data-value="0" class="text-sm font-bold mt-1 text-rose-500 dark:text-rose-400">Rp 0</p>
         </div>
       </div>
 
@@ -403,7 +412,6 @@
       </div>
     </main>
 
-  <!-- Bagian Bawah UI dan Logika Skrip Anda Tetap Dipertahankan Sesuai Aslinya -->
   <button onclick="loadDataFromServer(true)" id="btn-reload" class="hidden fixed bottom-24 right-6 bg-white/70 dark:bg-slate-800/80 backdrop-blur-lg border border-white/50 dark:border-slate-700/50 text-indigo-600 dark:text-indigo-400 w-14 h-14 rounded-full shadow-[0_12px_30px_rgba(79,70,229,0.25)] flex items-center justify-center z-50 active:scale-90 transition duration-200 select-none touch-manipulation">
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
   </button>
@@ -439,7 +447,6 @@
     </div>
   </nav>
 
-  <!-- Skrip JavaScript Utama Anda Tetap Asli Tanpa Ada Perubahan Logika -->
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycby1rWNFuzmYu6V0-T0EaM6oHNZWvUZqy5CDE15LP2PN1aJ2FgPaFsSNBV14_xFaFz4d/exec";
     let globalTransactions = []; 
@@ -458,13 +465,49 @@
     const formatter = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 });
 
     /* =======================================
+       FITUR BARU: HIDE / SHOW SALDO
+       ======================================= */
+    let isSaldoVisible = localStorage.getItem('fw_saldo_visible') !== 'false';
+
+    function toggleSaldoVisibility() {
+        isSaldoVisible = !isSaldoVisible;
+        updateSaldoVisibility();
+    }
+
+    function updateSaldoVisibility() {
+        const elSaldoAwal = document.getElementById("txt-saldo-awal");
+        const elPengeluaran = document.getElementById("txt-pengeluaran");
+        const elSaldo = document.getElementById("txt-saldo");
+        const btn = document.getElementById("btn-toggle-saldo");
+
+        // Ambil nilai murni yang disimpan di dataset
+        const vPemasukan = elSaldoAwal.dataset.value || 0;
+        const vPengeluaran = elPengeluaran.dataset.value || 0;
+        const vSaldo = elSaldo.dataset.value || 0;
+
+        if (isSaldoVisible) {
+            elSaldoAwal.innerText = formatter.format(vPemasukan);
+            elPengeluaran.innerText = formatter.format(vPengeluaran);
+            elSaldo.innerText = formatter.format(vSaldo);
+            if(btn) btn.innerHTML = "👁️";
+        } else {
+            elSaldoAwal.innerText = "Rp •••••••";
+            elPengeluaran.innerText = "Rp •••••••";
+            elSaldo.innerText = "Rp •••••••";
+            if(btn) btn.innerHTML = "🙈";
+        }
+        localStorage.setItem('fw_saldo_visible', isSaldoVisible);
+    }
+    /* ======================================= */
+
+    /* =======================================
        FUNGSI BARU: DEBOUNCE UNTUK PENCARIAN
        ======================================= */
     let searchTimeout;
     function debounceSearchRiwayat() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
-            currentRiwayatLimit = 50; // Reset limit saat mencari
+            currentRiwayatLimit = 50; 
             renderRiwayatLengkap();
         }, 300);
     }
@@ -1056,11 +1099,17 @@
         }
       });
       
-      // Tambahkan (saldoAwal + totalP) agar Sisa Bulan Lalu digabung dengan Pemasukan Bulan Ini
-document.getElementById("txt-saldo-awal").innerText = formatter.format(filterB === "all" ? totalP : (saldoAwal + totalP));
+      // Simpan nilai asli ke attribute data-value, update UI dilakukan via updateSaldoVisibility()
+      const elSaldoAwal = document.getElementById("txt-saldo-awal");
+      const elPengeluaran = document.getElementById("txt-pengeluaran");
+      const elSaldo = document.getElementById("txt-saldo");
 
-document.getElementById("txt-pengeluaran").innerText = formatter.format(totalK);
-document.getElementById("txt-saldo").innerText = formatter.format((filterB === "all" ? totalP : saldoAwal) + totalP - totalK);
+      elSaldoAwal.dataset.value = filterB === "all" ? totalP : (saldoAwal + totalP);
+      elPengeluaran.dataset.value = totalK;
+      elSaldo.dataset.value = (filterB === "all" ? totalP : saldoAwal) + totalP - totalK;
+
+      // Update Tampilan Saldo sesuai status (Hide/Show)
+      updateSaldoVisibility();
       
       let html = "";
       globalTransactions.filter(t => {
