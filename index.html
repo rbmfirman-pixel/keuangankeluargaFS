@@ -206,12 +206,14 @@
         </select>
       </div>
 
+      <!-- Upgrade UI: Tombol Show/Hide Saldo -->
       <div class="bg-indigo-600 dark:bg-indigo-500 text-white p-7 rounded-3xl shadow-lg shadow-indigo-200 dark:shadow-none select-none transition-colors relative">
         <div class="flex justify-between items-start">
             <div>
                 <p class="text-indigo-200 dark:text-indigo-100 text-[11px] uppercase tracking-widest font-bold">Total Sisa Saldo</p>
                 <h1 id="txt-saldo" data-value="0" class="text-3xl font-bold mt-1">Rp 0</h1>
             </div>
+            <!-- Tombol Toggle Sentuh -->
             <button id="btn-toggle-saldo" onclick="toggleSaldoVisibility()" class="w-12 h-12 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center transition active:scale-90 text-xl border border-white/30 shadow-sm touch-manipulation z-10" title="Sembunyikan/Tampilkan Saldo">
                 🙉
             </button>
@@ -639,6 +641,7 @@
         const pass = document.getElementById("password").value; 
         document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none"); 
         
+        // PERBAIKAN: Tambahkan parameter redirect & headers
         fetch(API_URL, { 
             method: "POST", 
             redirect: "follow",
@@ -705,14 +708,7 @@
         if(!document.getElementById("view-laporan").classList.contains("hidden")) renderLaporanKeuangan();
     }
 
-    /* OPTIMASI: Pemuatan Data dari Server yang Ditingkatkan */
     function loadDataFromServer(isReload = false) {
-      const btnReload = document.getElementById("btn-reload");
-      if (btnReload && isReload) {
-          btnReload.classList.add("animate-spin");
-      }
-
-      // Gunakan cache langsung agar UI instan merender, tanpa efek memblokir layar sepenuhnya
       if (!isReload) {
           const cachedData = localStorage.getItem("fw_data_cache");
           if (cachedData) {
@@ -720,13 +716,17 @@
                   const res = JSON.parse(cachedData);
                   processDataResponse(res, false);
               } catch (e) {
+                  console.error("Cache rusak, memuat ulang...");
                   document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
               }
           } else {
               document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
           }
+      } else {
+          document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
       }
-
+      
+      // PERBAIKAN: Tambahkan parameter redirect & headers
       fetch(API_URL, { 
           method: "POST", 
           redirect: "follow",
@@ -736,23 +736,16 @@
       .then(response => response.json())
       .then(res => { 
         if(res.status === "success") {
-            const oldCache = localStorage.getItem("fw_data_cache");
-            const newCache = JSON.stringify(res);
-            // Aplikasi hanya akan render ulang UI jika ada data baru, sehingga lebih mulus dan tidak nge-lag
-            if (oldCache !== newCache || isReload) {
-                localStorage.setItem("fw_data_cache", newCache);
-                processDataResponse(res, isReload);
-            }
+            localStorage.setItem("fw_data_cache", JSON.stringify(res));
+            processDataResponse(res, isReload);
         } else { 
-            if(isReload || !localStorage.getItem("fw_data_cache")) alert("Gagal memuat data: " + res.message); 
+            alert("Gagal memuat data: " + res.message); 
         }
         document.getElementById("loader").classList.add("opacity-0", "pointer-events-none"); 
-        if(btnReload) btnReload.classList.remove("animate-spin");
       }).catch(err => { 
           console.error("Fetch Error:", err);
           document.getElementById("loader").classList.add("opacity-0", "pointer-events-none"); 
-          if(btnReload) btnReload.classList.remove("animate-spin");
-          if(!localStorage.getItem("fw_data_cache")) {
+          if(isReload || !localStorage.getItem("fw_data_cache")) {
               alert("Gagal mengambil data dari Google Sheet. Periksa koneksi internet Anda."); 
           }
       });
@@ -1053,6 +1046,7 @@
             user: localStorage.getItem("fw_user") || "Guest"
         };
         
+        // PERBAIKAN: Tambahkan parameter redirect & headers
         fetch(API_URL, { 
             method: "POST", 
             redirect: "follow",
@@ -1080,6 +1074,7 @@
         if(confirm("Apakah Anda yakin ingin menghapus transaksi ini dari Google Sheet?")) {
             document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
             
+            // PERBAIKAN: Tambahkan parameter redirect & headers
             fetch(API_URL, {
                 method: "POST",
                 redirect: "follow",
@@ -1096,7 +1091,7 @@
         }
     }
 
-    /* OPTIMASI: Perbaikan Logika Saldo */
+    /* Logika renderFilteredData yang disesuaikan untuk kalkulasi yang lebih rapi */
     function renderFilteredData() {
       const currentUser = (localStorage.getItem("fw_user") || "").toLowerCase();
       const rawFilterP = document.getElementById("filter-pencatat").value.toLowerCase();
@@ -1104,14 +1099,9 @@
       
       const filterB = document.getElementById("filter-bulan").value;
       
+      let totalSisaSaldo = 0; 
       let totalPemasukan = 0; 
       let totalPengeluaran = 0;
-      let totalSisaSaldo = 0; 
-      
-      let prevMonthPemasukan = 0;
-      let prevMonthPengeluaran = 0;
-      let currMonthPemasukan = 0;
-      let currMonthPengeluaran = 0;
       
       globalTransactions.forEach(trx => {
         const targetDate = trx.tgl;
@@ -1125,40 +1115,33 @@
         
         if (filterP !== "all" && (trx.pencatat || "").toString().toLowerCase() !== filterP) return;
         
-        if (filterB === "all") {
-             if (jenis === "pemasukan") totalPemasukan += n;
-             else if (jenis === "pengeluaran") totalPengeluaran += n;
-        } else {
-             const selectedM = parseInt(filterB);
-             const trxM = parseInt(m);
-
-             if (trxM === selectedM) {
-                 if (jenis === "pemasukan") currMonthPemasukan += n;
-                 else if (jenis === "pengeluaran") currMonthPengeluaran += n;
-             } else if (trxM === (selectedM === 0 ? 11 : selectedM - 1)) {
-                 if (jenis === "pemasukan") prevMonthPemasukan += n;
-                 else if (jenis === "pengeluaran") prevMonthPengeluaran += n;
-             }
+        // 1. Hitung Total Sisa Saldo (Akumulasi Semua Bulan/Waktu)
+        if (jenis === "pemasukan") {
+            totalSisaSaldo += n;
+        } else if (jenis === "pengeluaran") {
+            totalSisaSaldo -= n;
+        }
+        
+        // 2. Hitung Pemasukan & Pengeluaran HANYA untuk Bulan yang Dipilih
+        if (filterB === "all" || m === filterB) { 
+            if (jenis === "pemasukan") {
+                totalPemasukan += n; 
+            } else if (jenis === "pengeluaran") {
+                totalPengeluaran += n; 
+            }
         }
       });
-      
-      if (filterB === "all") {
-          totalSisaSaldo = totalPemasukan - totalPengeluaran;
-      } else {
-          totalPemasukan = currMonthPemasukan;
-          totalPengeluaran = currMonthPengeluaran;
-          const sisaBulanLalu = prevMonthPemasukan - prevMonthPengeluaran;
-          totalSisaSaldo = (currMonthPemasukan - currMonthPengeluaran) + sisaBulanLalu;
-      }
       
       const elSaldoAwal = document.getElementById("txt-saldo-awal");
       const elPengeluaran = document.getElementById("txt-pengeluaran");
       const elSaldo = document.getElementById("txt-saldo");
 
+      // Set atribut data untuk dipakai toggle hide/show saldo
       elSaldoAwal.dataset.value = totalPemasukan;
       elPengeluaran.dataset.value = totalPengeluaran;
       elSaldo.dataset.value = totalSisaSaldo;
 
+      // Update Tampilan Saldo sesuai status
       updateSaldoVisibility();
       
       let html = "";
