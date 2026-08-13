@@ -901,8 +901,8 @@
             else badgeColor = 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400';
 
             const dateDisplay = new Date(trx.tgl).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-            const trxSafeStr = encodeURIComponent(JSON.stringify(trx));
 
+            // Perbaikan: Mengirim langsung parameter trx.row ke fungsi, lebih aman terhadap karakter tanda kutip (') pada keterangan.
             html += `<div class="card p-4 flex justify-between items-center gap-4 select-none transition-colors">
                 <div class="min-w-0 flex-1 flex flex-col gap-1">
                     <div class="flex items-center gap-2">
@@ -919,7 +919,7 @@
                 </div>
                 
                 <div class="flex items-center gap-2 shrink-0">
-                    <button onclick="openEdit('${trxSafeStr}')" class="w-12 h-12 flex items-center justify-center bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/50 rounded-2xl active:scale-90 transition shadow-sm" title="Edit Data">✏️</button>
+                    <button onclick="openEdit(${trx.row})" class="w-12 h-12 flex items-center justify-center bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/50 rounded-2xl active:scale-90 transition shadow-sm" title="Edit Data">✏️</button>
                     <button onclick="openDelete(${trx.row})" class="w-12 h-12 flex items-center justify-center bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-200/50 dark:border-rose-900/50 rounded-2xl active:scale-90 transition shadow-sm" title="Hapus Data">🚫</button>
                 </div>
             </div>`;
@@ -951,8 +951,11 @@
         }
     }
 
-    function openEdit(encodedItem) {
-        const item = JSON.parse(decodeURIComponent(encodedItem));
+    // Perbaikan: Mencari objek asli dari state global untuk menghindari bentrok HTML (Quote bug)
+    function openEdit(rowId) {
+        const item = globalTransactions.find(t => t.row === rowId);
+        if(!item) return;
+
         editMode = true;
         editRow = item.row; 
         
@@ -979,7 +982,8 @@
         document.getElementById("in-kategori").value = item.kategori;
         document.getElementById("in-keterangan").value = item.keterangan;
         
-        document.getElementById("in-nominal").value = formatRupiah(item.nominal.toString());
+        // Perbaikan: Dibulatkan terlebih dahulu agar nilai ber-desimal tidak berantakan saat diformat
+        document.getElementById("in-nominal").value = formatRupiah(Math.round(item.nominal).toString());
         
         switchTab('input');
     }
