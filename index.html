@@ -663,7 +663,7 @@
             const script = document.createElement('script');
             const query = new URLSearchParams();
             query.set('action', action);
-            query.set('callback', callbackName);
+            query.set('prefix', callbackName);
             Object.keys(params || {}).forEach(key => {
                 const value = params[key];
                 if(value !== undefined && value !== null) query.set(key, String(value));
@@ -692,7 +692,7 @@
             };
 
             script.async = true;
-            script.onerror = () => finishError(new Error(`Gagal menghubungi server (${action})`));
+            script.onerror = () => finishError(new Error(`Gagal menghubungi server (${action}). Pastikan deployment Apps Script memakai versi terbaru dan akses Web App = Anyone.`));
             script.src = `${API_URL}?${query.toString()}`;
             document.body.appendChild(script);
         });
@@ -905,7 +905,7 @@
             }
         }).catch(err=>{
             console.error("Dashboard Read Error:",err);
-            if(!dashboardState) alert(err.message||"Gagal mengambil data dashboard dari Google Sheet.");
+            if(!dashboardState) alert('Gagal mengambil data dashboard: ' + (err.message||'Unknown error'));
         }).finally(()=>{
             dashboardLoading=false;
             if(token===dashboardRequestToken) setLoader(false);
