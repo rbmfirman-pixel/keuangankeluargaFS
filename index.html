@@ -416,8 +416,9 @@
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
   </button>
 
-  <nav id="bottom-nav" class="hidden fixed bottom-0 w-full bg-white/80 dark:bg-slate-800/90 backdrop-blur-lg border-t border-white/50 dark:border-slate-700/50 px-2 py-3 z-40 pb-safe shadow-[0_-4px_12px_rgba(0,0,0,0.03)] select-none transition-colors duration-300">
-    <div class="max-w-lg mx-auto flex justify-between items-center text-center">
+  <!-- PERBAIKAN: Penambahan left-0 right-0 max-w-lg mx-auto pada bottom-nav -->
+  <nav id="bottom-nav" class="hidden fixed bottom-0 left-0 right-0 max-w-lg mx-auto w-full bg-white/80 dark:bg-slate-800/90 backdrop-blur-lg border-t border-white/50 dark:border-slate-700/50 px-2 py-3 z-40 pb-safe shadow-[0_-4px_12px_rgba(0,0,0,0.03)] select-none transition-colors duration-300">
+    <div class="flex justify-between items-center text-center">
       <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center p-1 text-indigo-600 dark:text-indigo-400 transition active:scale-95 flex-1">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mb-1 mx-auto"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
         <span class="text-[9px] font-bold">Home</span>
@@ -902,7 +903,6 @@
 
             const dateDisplay = new Date(trx.tgl).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
 
-            // Perbaikan: Mengirim langsung parameter trx.row ke fungsi, lebih aman terhadap karakter tanda kutip (') pada keterangan.
             html += `<div class="card p-4 flex justify-between items-center gap-4 select-none transition-colors">
                 <div class="min-w-0 flex-1 flex flex-col gap-1">
                     <div class="flex items-center gap-2">
@@ -951,7 +951,6 @@
         }
     }
 
-    // Perbaikan: Mencari objek asli dari state global untuk menghindari bentrok HTML (Quote bug)
     function openEdit(rowId) {
         const item = globalTransactions.find(t => t.row === rowId);
         if(!item) return;
@@ -981,8 +980,6 @@
         
         document.getElementById("in-kategori").value = item.kategori;
         document.getElementById("in-keterangan").value = item.keterangan;
-        
-        // Perbaikan: Dibulatkan terlebih dahulu agar nilai ber-desimal tidak berantakan saat diformat
         document.getElementById("in-nominal").value = formatRupiah(Math.round(item.nominal).toString());
         
         switchTab('input');
@@ -1072,13 +1069,17 @@
         }
     }
 
+    /* PERBAIKAN: Logika renderFilteredData yang disesuaikan untuk kalkulasi yang lebih rapi */
     function renderFilteredData() {
       const currentUser = (localStorage.getItem("fw_user") || "").toLowerCase();
       const rawFilterP = document.getElementById("filter-pencatat").value.toLowerCase();
       const filterP = (currentUser === "admin") ? rawFilterP : currentUser; 
       
       const filterB = document.getElementById("filter-bulan").value;
-      let saldoAwal = 0; let totalP = 0; let totalK = 0;
+      
+      let totalSisaSaldo = 0; 
+      let totalPemasukan = 0; 
+      let totalPengeluaran = 0;
       
       globalTransactions.forEach(trx => {
         const targetDate = trx.tgl;
@@ -1092,27 +1093,33 @@
         
         if (filterP !== "all" && (trx.pencatat || "").toString().toLowerCase() !== filterP) return;
         
-        if (filterB === "all") { 
-            if (jenis === "pemasukan") saldoAwal += n; 
-        } else { 
-            if (parseInt(m) < parseInt(filterB)) { saldoAwal += (jenis === "pemasukan" ? n : -n); } 
+        // 1. Hitung Total Sisa Saldo (Akumulasi Semua Bulan/Waktu)
+        if (jenis === "pemasukan") {
+            totalSisaSaldo += n;
+        } else if (jenis === "pengeluaran") {
+            totalSisaSaldo -= n;
         }
         
+        // 2. Hitung Pemasukan & Pengeluaran HANYA untuk Bulan yang Dipilih
         if (filterB === "all" || m === filterB) { 
-            if (jenis === "pemasukan") totalP += n; else totalK += n; 
+            if (jenis === "pemasukan") {
+                totalPemasukan += n; 
+            } else if (jenis === "pengeluaran") {
+                totalPengeluaran += n; 
+            }
         }
       });
       
-      // Simpan nilai asli ke attribute data-value, update UI dilakukan via updateSaldoVisibility()
       const elSaldoAwal = document.getElementById("txt-saldo-awal");
       const elPengeluaran = document.getElementById("txt-pengeluaran");
       const elSaldo = document.getElementById("txt-saldo");
 
-      elSaldoAwal.dataset.value = filterB === "all" ? totalP : (saldoAwal + totalP);
-      elPengeluaran.dataset.value = totalK;
-      elSaldo.dataset.value = (filterB === "all" ? totalP : saldoAwal) + totalP - totalK;
+      // Set atribut data untuk dipakai toggle hide/show saldo
+      elSaldoAwal.dataset.value = totalPemasukan;
+      elPengeluaran.dataset.value = totalPengeluaran;
+      elSaldo.dataset.value = totalSisaSaldo;
 
-      // Update Tampilan Saldo sesuai status (Hide/Show)
+      // Update Tampilan Saldo sesuai status
       updateSaldoVisibility();
       
       let html = "";
