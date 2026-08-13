@@ -416,7 +416,6 @@
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
   </button>
 
-  <!-- PERBAIKAN: Penambahan left-0 right-0 max-w-lg mx-auto pada bottom-nav -->
   <nav id="bottom-nav" class="hidden fixed bottom-0 left-0 right-0 max-w-lg mx-auto w-full bg-white/80 dark:bg-slate-800/90 backdrop-blur-lg border-t border-white/50 dark:border-slate-700/50 px-2 py-3 z-40 pb-safe shadow-[0_-4px_12px_rgba(0,0,0,0.03)] select-none transition-colors duration-300">
     <div class="flex justify-between items-center text-center">
       <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center p-1 text-indigo-600 dark:text-indigo-400 transition active:scale-95 flex-1">
@@ -641,7 +640,14 @@
         const user = document.getElementById("username").value; 
         const pass = document.getElementById("password").value; 
         document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none"); 
-        fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "login", username: user, password: pass }) })
+        
+        // PERBAIKAN: Tambahkan parameter redirect & headers
+        fetch(API_URL, { 
+            method: "POST", 
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ action: "login", username: user, password: pass }) 
+        })
         .then(res => res.json()).then(res => { 
             if(res.status === "success") { localStorage.setItem("fw_user", user); location.reload(); } 
             else { document.getElementById("loader").classList.add("opacity-0", "pointer-events-none"); alert(res.message); } 
@@ -720,7 +726,13 @@
           document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
       }
       
-      fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "getTransactions" }) })
+      // PERBAIKAN: Tambahkan parameter redirect & headers
+      fetch(API_URL, { 
+          method: "POST", 
+          redirect: "follow",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: "getTransactions" }) 
+      })
       .then(response => response.json())
       .then(res => { 
         if(res.status === "success") {
@@ -1034,7 +1046,13 @@
             user: localStorage.getItem("fw_user") || "Guest"
         };
         
-        fetch(API_URL, { method: "POST", body: JSON.stringify(payload) })
+        // PERBAIKAN: Tambahkan parameter redirect & headers
+        fetch(API_URL, { 
+            method: "POST", 
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload) 
+        })
         .then(res => res.json())
         .then(res => {
             if(res.status === "success") {
@@ -1055,8 +1073,12 @@
     function openDelete(rowId) {
         if(confirm("Apakah Anda yakin ingin menghapus transaksi ini dari Google Sheet?")) {
             document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
+            
+            // PERBAIKAN: Tambahkan parameter redirect & headers
             fetch(API_URL, {
                 method: "POST",
+                redirect: "follow",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({ action: "deleteTransaction", row: rowId })
             }).then(res => res.json()).then(res => {
                 if(res.status === "success") { loadDataFromServer(true); } 
@@ -1069,7 +1091,7 @@
         }
     }
 
-    /* PERBAIKAN: Logika renderFilteredData yang disesuaikan untuk kalkulasi yang lebih rapi */
+    /* Logika renderFilteredData yang disesuaikan untuk kalkulasi yang lebih rapi */
     function renderFilteredData() {
       const currentUser = (localStorage.getItem("fw_user") || "").toLowerCase();
       const rawFilterP = document.getElementById("filter-pencatat").value.toLowerCase();
