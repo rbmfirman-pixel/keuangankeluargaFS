@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <title>FamilyWealth</title>
   
+  <!-- Optimasi Preconnect agar font lebih cepat dimuat -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;600;700&display=swap" rel="stylesheet">
@@ -17,6 +18,7 @@
     }
   </script>
   
+  <!-- Optimasi Defer agar script tidak memblokir render utama HTML -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
   
   <style>
@@ -204,270 +206,12 @@
         </select>
       </div>
 
-      <!-- Upgrade UI: Tombol Show/Hide Saldo -->
       <div class="bg-indigo-600 dark:bg-indigo-500 text-white p-7 rounded-3xl shadow-lg shadow-indigo-200 dark:shadow-none select-none transition-colors relative">
         <div class="flex justify-between items-start">
             <div>
                 <p class="text-indigo-200 dark:text-indigo-100 text-[11px] uppercase tracking-widest font-bold">Total Sisa Saldo</p>
                 <h1 id="txt-saldo" data-value="0" class="text-3xl font-bold mt-1">Rp 0</h1>
             </div>
-            <!-- Tombol Toggle Sentuh -->
-            <button id="btn-toggle-saldo" onclick="toggleSaldoVisibility()" class="w-12 h-12 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center transition active:scale-90 text-xl border border-white/30 shadow-sm touch-manipulation z-10" title="Sembunyikan/Tampilkan Saldo">
-                🙉
-            </button>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-4 select-none">
-        <div class="card p-5">
-          <p class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Pemasukan</p>
-          <p id="txt-saldo-awal" data-value="0" class="text-sm font-bold mt-1 text-slate-700 dark:text-slate-200">Rp 0</p>
-        </div>
-        <div class="card p-5">
-          <p class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Pengeluaran</p>
-          <p id="txt-pengeluaran" data-value="0" class="text-sm font-bold mt-1 text-rose-500 dark:text-rose-400">Rp 0</p>
-        </div>
-      </div>
-
-      <div class="card p-5 h-72"><canvas id="canvasTrenSaldo"></canvas></div>
-
-      <div class="card p-6 mb-4">
-        <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 mb-4 select-none">Transaksi Terbaru</h3>
-        <div id="list-riwayat-singkat" class="space-y-2"></div>
-      </div>
-    </main>
-
-    <main id="view-riwayat" class="hidden px-6 space-y-4 fade-in">
-      <div class="relative">
-        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-base select-none z-10 flex items-center justify-center">🔍</span>
-        <input type="text" idTentu, saya telah memperbarui dan menyiapkan kode HTML selengkapnya untuk Anda. 
-
-Penyesuaian yang dilakukan pada kode ini meliputi:
-*   **Pembaruan URL Google Apps Script**: Kode telah dihubungkan dengan URL *endpoint* terbaru yang Anda berikan[cite: 1].
-*   **Penyesuaian Visibilitas dan Tata Letak**: Saya menyesuaikan ukuran dan perataan teks pada bagian tajuk (header) dan judul agar berada simetris di tengah. Hal ini akan membuatnya jauh lebih mudah dibaca, terutama saat aplikasi diakses melalui HP.
-*   **Struktur dan Fitur Tetap Utuh**: Sesuai instruksi Anda, seluruh fitur dasar seperti Input Data, Riwayat, Laporan, dan Pengaturan (*Settings*) dipertahankan sepenuhnya dari kode dasar yang Anda lampirkan[cite: 1].
-*   **Logika Saldo**: Logika akumulasi "Total Sisa Saldo" untuk seluruh waktu tetap tidak diubah dan bekerja sesuai dengan kebutuhan Anda.
-
-Berikut adalah kode lengkapnya yang siap Anda *copy-paste*:
-
-```html
-<!DOCTYPE html>
-<html lang="id" class="light">
-<head>
-  <base target="_top">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-  <title>FamilyWealth</title>
-  
-  <!-- Optimasi Preconnect agar font lebih cepat dimuat -->
-  <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
-  <link rel="preconnect" href="[https://fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
-  <link href="[https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;600;700&display=swap](https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;600;700&display=swap)" rel="stylesheet">
-  
-  <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-    }
-  </script>
-  
-  <!-- Optimasi Defer agar script tidak memblokir render utama HTML -->
-  <script src="[https://cdn.jsdelivr.net/npm/chart.js](https://cdn.jsdelivr.net/npm/chart.js)" defer></script>
-  
-  <style>
-    body { 
-        font-family: 'Plus Jakarta Sans', sans-serif; 
-        -webkit-tap-highlight-color: transparent; 
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    .card { background: white; border-radius: 24px; box-shadow: 0 4px 18px -1px rgb(0 0 0 / 0.03); border: 1px solid #f1f5f9; transition: all 0.3s ease; }
-    .dark .card { background: #1e293b; border-color: #334155; box-shadow: 0 4px 18px -1px rgb(0 0 0 / 0.2); }
-    
-    input, select, textarea { 
-        height: 52px !important; 
-        padding: 0 16px !important; 
-        width: 100%; 
-        border-radius: 16px; 
-        border: 1px solid #e2e8f0; 
-        outline: none; 
-        font-size: 15px !important; 
-        background-color: white; 
-        transition: all 0.2s; 
-        touch-action: manipulation;
-    }
-    input:focus, select:focus {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-    }
-    .dark input, .dark select { background-color: #334155; border-color: #475569; color: #f8fafc; }
-    .dark input:focus, .dark select:focus { border-color: #818cf8; box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.15); }
-    
-    .fade-in { animation: fadeIn 0.4s ease-in-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-    
-    button, a { border-radius: 16px; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
-    
-    .loader-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.3s; }
-    .dark .loader-overlay { background: rgba(15,23,42,0.95); }
-    
-    .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #4f46e5; border-radius: 50%; animation: spin 1s linear infinite; }
-    .dark .spinner { border-color: #334155; border-top-color: #818cf8; }
-    
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    ::-webkit-scrollbar { width: 0px; background: transparent; }
-
-    /* ==========================================================================
-       UPGRADE TAMPILAN: MINT GLASSMORPHISM (SUPPORT LIGHT & DARK MODE)
-       ========================================================================== */
-    html.mint body {
-        background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 50%, #81e6d9 100%) !important;
-        color: #234e52 !important;
-    }
-    html.mint body::before {
-        content: ""; position: fixed; top: -10%; left: -20%; width: 400px; height: 400px;
-        background: radial-gradient(circle, rgba(79,209,197,0.4) 0%, rgba(255,255,255,0) 70%);
-        filter: blur(50px); z-index: -1; pointer-events: none;
-    }
-    html.mint body::after {
-        content: ""; position: fixed; bottom: -10%; right: -20%; width: 400px; height: 400px;
-        background: radial-gradient(circle, rgba(49,151,149,0.3) 0%, rgba(255,255,255,0) 70%);
-        filter: blur(50px); z-index: -1; pointer-events: none;
-    }
-    html.mint header { 
-        background: rgba(255, 255, 255, 0.45) !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
-    }
-    html.mint .card {
-        background: rgba(255, 255, 255, 0.45) !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.6) !important;
-        box-shadow: 0 8px 32px 0 rgba(49, 151, 149, 0.08) !important;
-    }
-    html.mint input, html.mint select {
-        background: rgba(255, 255, 255, 0.5) !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.6) !important;
-        color: #234e52 !important;
-    }
-    html.mint input::placeholder { color: #4a5568 !important; }
-    html.mint .bg-indigo-600 {
-        background: linear-gradient(135deg, #319795 0%, #2c7a7b 100%) !important;
-        box-shadow: 0 12px 24px -6px rgba(44, 122, 123, 0.35) !important;
-    }
-    html.mint .text-indigo-200 { color: #e6fffa !important; }
-    html.mint .text-indigo-600 { color: #2c7a7b !important; }
-    html.mint #bottom-nav {
-        background: rgba(255, 255, 255, 0.5) !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.4) !important;
-    }
-    html.mint .text-slate-800, html.mint .text-slate-700, html.mint .text-slate-600, html.mint #header-title { color: #234e52 !important; }
-    html.mint .text-slate-500, html.mint .text-slate-400 { color: #4a5568 !important; }
-    html.mint .bg-indigo-50 { background: rgba(230, 255, 250, 0.5) !important; border-color: rgba(178, 245, 234, 0.6) !important; }
-    html.mint .text-indigo-900 { color: #234e52 !important; }
-    html.mint button[type="submit"] { background: linear-gradient(135deg, #319795 0%, #2c7a7b 100%) !important; }
-    html.mint #btn-reload { background: rgba(255, 255, 255, 0.5) !important; border-color: rgba(255, 255, 255, 0.6) !important; color: #2c7a7b !important; }
-    html.mint .loader-overlay { background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%) !important; }
-    html.mint .spinner { border-color: rgba(255,255,255,0.5); border-top-color: #319795; }
-
-    /* ---- MINT: DARK MODE (Gelap) ---- */
-    html.mint.dark body {
-        background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%) !important;
-        color: #f8fafc !important;
-    }
-    html.mint.dark header {
-        background: rgba(30, 41, 59, 0.45) !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-    }
-    html.mint.dark body::before { background: radial-gradient(circle, rgba(20,184,166,0.15) 0%, rgba(255,255,255,0) 70%); }
-    html.mint.dark body::after { background: radial-gradient(circle, rgba(13,148,136,0.15) 0%, rgba(255,255,255,0) 70%); }
-    html.mint.dark .card {
-        background: rgba(30, 41, 59, 0.45) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
-    }
-    html.mint.dark input, html.mint.dark select {
-        background: rgba(15, 23, 42, 0.5) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        color: #ccfbf1 !important;
-    }
-    html.mint.dark input::placeholder { color: #5eead4 !important; opacity: 0.6; }
-    html.mint.dark .bg-indigo-600, html.mint.dark .dark\:bg-indigo-500, html.mint.dark button[type="submit"] {
-        background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%) !important;
-        box-shadow: 0 12px 24px -6px rgba(13, 148, 136, 0.35) !important;
-    }
-    html.mint.dark .text-indigo-200, html.mint.dark .dark\:text-indigo-100 { color: #99f6e4 !important; }
-    html.mint.dark .text-indigo-600, html.mint.dark .dark\:text-indigo-400 { color: #2dd4bf !important; }
-    html.mint.dark #bottom-nav {
-        background: rgba(15, 23, 42, 0.65) !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-    }
-    html.mint.dark .text-slate-800, html.mint.dark .text-slate-700, html.mint.dark .text-slate-600, 
-    html.mint.dark .dark\:text-slate-100, html.mint.dark .dark\:text-slate-200, html.mint.dark #header-title { color: #ccfbf1 !important; }
-    html.mint.dark .text-slate-500, html.mint.dark .text-slate-400,
-    html.mint.dark .dark\:text-slate-400, html.mint.dark .dark\:text-slate-500 { color: #5eead4 !important; }
-    html.mint.dark .bg-indigo-50, html.mint.dark .dark\:bg-indigo-900\/30 { background: rgba(13, 148, 136, 0.15) !important; border-color: rgba(20, 184, 166, 0.2) !important; }
-    html.mint.dark .text-indigo-900, html.mint.dark .dark\:text-indigo-300 { color: #99f6e4 !important; }
-    html.mint.dark #btn-reload { background: rgba(30, 41, 59, 0.6) !important; border-color: rgba(255, 255, 255, 0.1) !important; color: #2dd4bf !important; }
-    html.mint.dark .loader-overlay { background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%) !important; }
-    html.mint.dark .spinner { border-color: rgba(255,255,255,0.1); border-top-color: #2dd4bf; }
-  </style>
-</head>
-<body class="min-h-screen text-slate-800 dark:text-slate-100 bg-[#f8fafc] dark:bg-slate-900 pb-28 transition-colors duration-300">
-
-  <div id="loader" class="loader-overlay opacity-0 pointer-events-none">
-    <div class="spinner mb-4"></div>
-    <p class="font-bold text-slate-500 dark:text-slate-400 select-none">Memuat Data...</p>
-  </div>
-
-  <div id="login-section" class="fixed inset-0 flex items-center justify-center p-4 z-50 bg-slate-50 dark:bg-slate-900 hidden transition-colors duration-300">
-    <div class="w-full max-w-sm bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700">
-      <h1 class="text-3xl font-bold text-center mb-8 text-slate-800 dark:text-slate-100 select-none">FamilyWealth</h1>
-      <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
-        <input type="text" id="username" placeholder="Username" required>
-        <div class="relative">
-          <input type="password" id="password" placeholder="Password" required>
-          <span onclick="togglePassword()" class="absolute right-5 top-4 cursor-pointer text-slate-400 select-none text-xl flex items-center justify-center h-full pb-4 w-10" id="eye-icon">🙈</span>
-        </div>
-        <button type="submit" class="w-full h-[56px] bg-indigo-600 dark:bg-indigo-500 text-white font-bold hover:bg-indigo-700 transition active:scale-95">Masuk</button>
-      </form>
-    </div>
-  </div>
-
-  <div id="app-section" class="hidden max-w-lg mx-auto fade-in pt-24">
-    <!-- Diperbarui agar tajuk (teks Dashboard) lebih besar dan simetris di tengah -->
-    <header class="fixed top-0 left-0 right-0 max-w-lg mx-auto w-full p-6 flex justify-center items-center bg-[#f8fafc]/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50 z-40 select-none transition-colors duration-300">
-      <h2 id="header-title" class="font-bold text-2xl text-center text-slate-800 dark:text-slate-100 w-full">Dashboard</h2>
-    </header>
-
-    <main id="view-home" class="px-6 space-y-6">
-      <div class="grid grid-cols-2 gap-4">
-        <select id="filter-pencatat" onchange="renderFilteredData(); refreshActiveTab();" class="cursor-pointer shadow-sm">
-          <option value="all">Semua Orang</option>
-        </select>
-        <select id="filter-bulan" onchange="renderFilteredData()" class="cursor-pointer shadow-sm">
-          <option value="all">Semua Bulan</option>
-          <option value="0">Jan</option><option value="1">Feb</option><option value="2">Mar</option>
-          <option value="3">Apr</option><option value="4">Mei</option><option value="5">Jun</option>
-          <option value="6">Jul</option><option value="7">Ags</option><option value="8">Sep</option>
-          <option value="9">Okt</option><option value="10">Nov</option><option value="11">Des</option>
-        </select>
-      </div>
-
-      <!-- Tombol Show/Hide Saldo -->
-      <div class="bg-indigo-600 dark:bg-indigo-500 text-white p-7 rounded-3xl shadow-lg shadow-indigo-200 dark:shadow-none select-none transition-colors relative">
-        <div class="flex justify-between items-start">
-            <div>
-                <p class="text-indigo-200 dark:text-indigo-100 text-[11px] uppercase tracking-widest font-bold">Total Sisa Saldo</p>
-                <h1 id="txt-saldo" data-value="0" class="text-3xl font-bold mt-1">Rp 0</h1>
-            </div>
-            <!-- Tombol Toggle Sentuh -->
             <button id="btn-toggle-saldo" onclick="toggleSaldoVisibility()" class="w-12 h-12 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center transition active:scale-90 text-xl border border-white/30 shadow-sm touch-manipulation z-10" title="Sembunyikan/Tampilkan Saldo">
                 🙉
             </button>
@@ -667,42 +411,42 @@ Berikut adalah kode lengkapnya yang siap Anda *copy-paste*:
     </main>
 
   <button onclick="loadDataFromServer(true)" id="btn-reload" class="hidden fixed bottom-24 right-6 bg-white/70 dark:bg-slate-800/80 backdrop-blur-lg border border-white/50 dark:border-slate-700/50 text-indigo-600 dark:text-indigo-400 w-14 h-14 rounded-full shadow-[0_12px_30px_rgba(79,70,229,0.25)] flex items-center justify-center z-50 active:scale-90 transition duration-200 select-none touch-manipulation">
-    <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
   </button>
 
   <nav id="bottom-nav" class="hidden fixed bottom-0 left-0 right-0 max-w-lg mx-auto w-full bg-white/80 dark:bg-slate-800/90 backdrop-blur-lg border-t border-white/50 dark:border-slate-700/50 px-2 py-3 z-40 pb-safe shadow-[0_-4px_12px_rgba(0,0,0,0.03)] select-none transition-colors duration-300">
     <div class="flex justify-between items-center text-center">
       <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center p-1 text-indigo-600 dark:text-indigo-400 transition active:scale-95 flex-1">
-        <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mb-1 mx-auto"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mb-1 mx-auto"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
         <span class="text-[9px] font-bold">Home</span>
       </button>
       
       <button onclick="switchTab('riwayat')" id="nav-riwayat" class="flex flex-col items-center p-1 text-slate-400 dark:text-slate-500 transition active:scale-95 flex-1">
-        <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mb-1 mx-auto"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mb-1 mx-auto"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
         <span class="text-[9px] font-bold">Riwayat</span>
       </button>
       
       <button onclick="switchTab('input')" id="nav-input" class="flex flex-col items-center p-1 text-slate-400 dark:text-slate-500 transition active:scale-95 flex-1">
         <div class="w-11 h-11 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 dark:shadow-none mb-0.5 -mt-5 transform active:scale-90 transition duration-200 mx-auto">
-          <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
         </div>
         <span class="text-[9px] font-bold text-indigo-600 dark:text-indigo-400">Input</span>
       </button>
 
       <button onclick="switchTab('laporan')" id="nav-laporan" class="flex flex-col items-center p-1 text-slate-400 dark:text-slate-500 transition active:scale-95 flex-1">
-        <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mb-1 mx-auto"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mb-1 mx-auto"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" /></svg>
         <span class="text-[9px] font-bold">Laporan</span>
       </button>
 
       <button onclick="switchTab('settings')" id="nav-settings" class="flex flex-col items-center p-1 text-slate-400 dark:text-slate-500 transition active:scale-95 flex-1">
-        <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mb-1 mx-auto"><path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mb-1 mx-auto"><path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
         <span class="text-[9px] font-bold">Setting</span>
       </button>
     </div>
   </nav>
 
   <script>
-    const API_URL = "[https://script.google.com/macros/s/AKfycby1rWNFuzmYu6V0-T0EaM6oHNZWvUZqy5CDE15LP2PN1aJ2FgPaFsSNBV14_xFaFz4d/exec](https://script.google.com/macros/s/AKfycby1rWNFuzmYu6V0-T0EaM6oHNZWvUZqy5CDE15LP2PN1aJ2FgPaFsSNBV14_xFaFz4d/exec)";
+    const API_URL = "https://script.google.com/macros/s/AKfycby1rWNFuzmYu6V0-T0EaM6oHNZWvUZqy5CDE15LP2PN1aJ2FgPaFsSNBV14_xFaFz4d/exec";
     let globalTransactions = []; 
     let chartInstance = null;
     let chartDoughnutInstance = null;
@@ -961,7 +705,14 @@ Berikut adalah kode lengkapnya yang siap Anda *copy-paste*:
         if(!document.getElementById("view-laporan").classList.contains("hidden")) renderLaporanKeuangan();
     }
 
+    /* OPTIMASI: Pemuatan Data dari Server yang Ditingkatkan */
     function loadDataFromServer(isReload = false) {
+      const btnReload = document.getElementById("btn-reload");
+      if (btnReload && isReload) {
+          btnReload.classList.add("animate-spin");
+      }
+
+      // Gunakan cache langsung agar UI instan merender, tanpa efek memblokir layar sepenuhnya
       if (!isReload) {
           const cachedData = localStorage.getItem("fw_data_cache");
           if (cachedData) {
@@ -969,16 +720,13 @@ Berikut adalah kode lengkapnya yang siap Anda *copy-paste*:
                   const res = JSON.parse(cachedData);
                   processDataResponse(res, false);
               } catch (e) {
-                  console.error("Cache rusak, memuat ulang...");
                   document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
               }
           } else {
               document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
           }
-      } else {
-          document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
       }
-      
+
       fetch(API_URL, { 
           method: "POST", 
           redirect: "follow",
@@ -988,16 +736,23 @@ Berikut adalah kode lengkapnya yang siap Anda *copy-paste*:
       .then(response => response.json())
       .then(res => { 
         if(res.status === "success") {
-            localStorage.setItem("fw_data_cache", JSON.stringify(res));
-            processDataResponse(res, isReload);
+            const oldCache = localStorage.getItem("fw_data_cache");
+            const newCache = JSON.stringify(res);
+            // Aplikasi hanya akan render ulang UI jika ada data baru, sehingga lebih mulus dan tidak nge-lag
+            if (oldCache !== newCache || isReload) {
+                localStorage.setItem("fw_data_cache", newCache);
+                processDataResponse(res, isReload);
+            }
         } else { 
-            alert("Gagal memuat data: " + res.message); 
+            if(isReload || !localStorage.getItem("fw_data_cache")) alert("Gagal memuat data: " + res.message); 
         }
         document.getElementById("loader").classList.add("opacity-0", "pointer-events-none"); 
+        if(btnReload) btnReload.classList.remove("animate-spin");
       }).catch(err => { 
           console.error("Fetch Error:", err);
           document.getElementById("loader").classList.add("opacity-0", "pointer-events-none"); 
-          if(isReload || !localStorage.getItem("fw_data_cache")) {
+          if(btnReload) btnReload.classList.remove("animate-spin");
+          if(!localStorage.getItem("fw_data_cache")) {
               alert("Gagal mengambil data dari Google Sheet. Periksa koneksi internet Anda."); 
           }
       });
@@ -1234,18 +989,12 @@ Berikut adalah kode lengkapnya yang siap Anda *copy-paste*:
         
         setInputJenis(item.jenis);
         
-        // Peningkatan keamanan zona waktu agar tanggal tidak bergeser saat di-edit
         if(item.tgl) {
-            const tglStr = item.tgl.toString();
-            if(tglStr.includes('T')) {
-                document.getElementById("in-tgl").value = tglStr.split('T')[0];
-            } else {
-                const d = new Date(item.tgl);
-                const y = d.getFullYear();
-                const m = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                document.getElementById("in-tgl").value = `${y}-${m}-${day}`;
-            }
+            const d = new Date(item.tgl);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            document.getElementById("in-tgl").value = `${y}-${m}-${day}`;
         }
         
         document.getElementById("in-kategori").value = item.kategori;
@@ -1347,7 +1096,7 @@ Berikut adalah kode lengkapnya yang siap Anda *copy-paste*:
         }
     }
 
-    /* Logika renderFilteredData yang disesuaikan untuk kalkulasi yang lebih rapi */
+    /* OPTIMASI: Perbaikan Logika Saldo */
     function renderFilteredData() {
       const currentUser = (localStorage.getItem("fw_user") || "").toLowerCase();
       const rawFilterP = document.getElementById("filter-pencatat").value.toLowerCase();
@@ -1355,9 +1104,14 @@ Berikut adalah kode lengkapnya yang siap Anda *copy-paste*:
       
       const filterB = document.getElementById("filter-bulan").value;
       
-      let totalSisaSaldo = 0; 
       let totalPemasukan = 0; 
       let totalPengeluaran = 0;
+      let totalSisaSaldo = 0; 
+      
+      let prevMonthPemasukan = 0;
+      let prevMonthPengeluaran = 0;
+      let currMonthPemasukan = 0;
+      let currMonthPengeluaran = 0;
       
       globalTransactions.forEach(trx => {
         const targetDate = trx.tgl;
@@ -1371,33 +1125,40 @@ Berikut adalah kode lengkapnya yang siap Anda *copy-paste*:
         
         if (filterP !== "all" && (trx.pencatat || "").toString().toLowerCase() !== filterP) return;
         
-        // 1. Hitung Total Sisa Saldo (Akumulasi Semua Bulan/Waktu - Tidak Diubah)
-        if (jenis === "pemasukan") {
-            totalSisaSaldo += n;
-        } else if (jenis === "pengeluaran") {
-            totalSisaSaldo -= n;
-        }
-        
-        // 2. Hitung Pemasukan & Pengeluaran HANYA untuk Bulan yang Dipilih
-        if (filterB === "all" || m === filterB) { 
-            if (jenis === "pemasukan") {
-                totalPemasukan += n; 
-            } else if (jenis === "pengeluaran") {
-                totalPengeluaran += n; 
-            }
+        if (filterB === "all") {
+             if (jenis === "pemasukan") totalPemasukan += n;
+             else if (jenis === "pengeluaran") totalPengeluaran += n;
+        } else {
+             const selectedM = parseInt(filterB);
+             const trxM = parseInt(m);
+
+             if (trxM === selectedM) {
+                 if (jenis === "pemasukan") currMonthPemasukan += n;
+                 else if (jenis === "pengeluaran") currMonthPengeluaran += n;
+             } else if (trxM === (selectedM === 0 ? 11 : selectedM - 1)) {
+                 if (jenis === "pemasukan") prevMonthPemasukan += n;
+                 else if (jenis === "pengeluaran") prevMonthPengeluaran += n;
+             }
         }
       });
+      
+      if (filterB === "all") {
+          totalSisaSaldo = totalPemasukan - totalPengeluaran;
+      } else {
+          totalPemasukan = currMonthPemasukan;
+          totalPengeluaran = currMonthPengeluaran;
+          const sisaBulanLalu = prevMonthPemasukan - prevMonthPengeluaran;
+          totalSisaSaldo = (currMonthPemasukan - currMonthPengeluaran) + sisaBulanLalu;
+      }
       
       const elSaldoAwal = document.getElementById("txt-saldo-awal");
       const elPengeluaran = document.getElementById("txt-pengeluaran");
       const elSaldo = document.getElementById("txt-saldo");
 
-      // Set atribut data untuk dipakai toggle hide/show saldo
       elSaldoAwal.dataset.value = totalPemasukan;
       elPengeluaran.dataset.value = totalPengeluaran;
       elSaldo.dataset.value = totalSisaSaldo;
 
-      // Update Tampilan Saldo sesuai status
       updateSaldoVisibility();
       
       let html = "";
