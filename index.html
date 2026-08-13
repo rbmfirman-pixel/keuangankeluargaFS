@@ -454,6 +454,12 @@
     let chartDoughnutInstance = null;
     let chartTrendInstance = null;
     let chartCompareInstance = null;
+
+    // Upgrade 1: state dashboard / lazy loading data detail
+    let dashboardState = null;
+    let transactionsLoaded = false;
+    let transactionsLoading = false;
+    let dashboardRequestToken = 0;
     
     // Pagination / Limit State
     let currentRiwayatLimit = 50;
@@ -507,8 +513,9 @@
     function debounceSearchRiwayat() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
-            currentRiwayatLimit = 50; 
-            renderRiwayatLengkap();
+            currentRiwayatLimit = 50;
+            if(transactionsLoaded) renderRiwayatLengkap();
+            else loadTransactionsForHistory();
         }, 300);
     }
 
@@ -517,7 +524,8 @@
        ======================================= */
     function resetRiwayatLimitAndRender() {
         currentRiwayatLimit = 50;
-        renderRiwayatLengkap();
+        if(transactionsLoaded) renderRiwayatLengkap();
+        else loadTransactionsForHistory();
     }
     
     function loadMoreRiwayat() {
@@ -692,8 +700,8 @@
         document.getElementById("header-title").innerText = titles[tab] || "FamilyWealth";
         
         if(tab === 'riwayat') {
-            currentRiwayatLimit = 50; 
-            renderRiwayatLengkap();
+            currentRiwayatLimit = 50;
+            loadTransactionsForHistory();
         }
         if(tab === 'laporan') renderLaporanKeuangan();
         if(tab === 'settings') {
@@ -704,57 +712,18 @@
     }
 
     function refreshActiveTab() {
-        if(!document.getElementById("view-riwayat").classList.contains("hidden")) renderRiwayatLengkap();
+        if(!document.getElementById("view-riwayat").classList.contains("hidden")) {
+            if(transactionsLoaded) renderRiwayatLengkap();
+            else loadTransactionsForHistory();
+        }
         if(!document.getElementById("view-laporan").classList.contains("hidden")) renderLaporanKeuangan();
     }
 
     function loadDataFromServer(isReload = false) {
-      if (!isReload) {
-          const cachedData = localStorage.getItem("fw_data_cache");
-          if (cachedData) {
-              try {
-                  const res = JSON.parse(cachedData);
-                  processDataResponse(res, false);
-              } catch (e) {
-                  console.error("Cache rusak, memuat ulang...");
-                  document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
-              }
-          } else {
-              document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
-          }
-      } else {
-          document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
-      }
-      
-      // PERBAIKAN: Tambahkan parameter redirect & headers
-      fetch(API_URL, { 
-          method: "POST", 
-          redirect: "follow",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ action: "getTransactions" }) 
-      })
-      .then(response => response.json())
-      .then(res => { 
-        if(res.status === "success") {
-            localStorage.setItem("fw_data_cache", JSON.stringify(res));
-            processDataResponse(res, isReload);
-        } else { 
-            alert("Gagal memuat data: " + res.message); 
-        }
-        document.getElementById("loader").classList.add("opacity-0", "pointer-events-none"); 
-      }).catch(err => { 
-          console.error("Fetch Error:", err);
-          document.getElementById("loader").classList.add("opacity-0", "pointer-events-none"); 
-          if(isReload || !localStorage.getItem("fw_data_cache")) {
-              alert("Gagal mengambil data dari Google Sheet. Periksa koneksi internet Anda."); 
-          }
-      });
+        loadDashboardData(isReload);
     }
 
-    function processDataResponse(res, isReload) {
-        globalTransactions = res.data;
-        globalTransactions.forEach((trx, index) => { trx._originalIndex = index; });
-
+    function applyMetadata(res) {
         const inKategori = document.getElementById("in-kategori");
         if(inKategori && res.categories) {
             inKategori.innerHTML = '<option value="" disabled selected>Pilih Kategori</option>';
@@ -766,7 +735,6 @@
 
         const inPencatat = document.getElementById("in-pencatat");
         const filterPencatat = document.getElementById("filter-pencatat");
-        
         if(res.users) {
             if(inPencatat) {
                 inPencatat.innerHTML = '<option value="" disabled selected>Pilih Pencatat</option>';
@@ -775,7 +743,7 @@
                     inPencatat.appendChild(opt);
                 });
             }
-            
+
             const userLogin = localStorage.getItem("fw_user") || "";
             if(filterPencatat && userLogin.toLowerCase() === "admin") {
                 filterPencatat.innerHTML = '<option value="all">Semua Orang</option>';
@@ -786,22 +754,15 @@
             }
         }
 
-        if(!isReload) {
-            const curM = new Date().getMonth().toString();
-            document.getElementById("filter-bulan").value = curM;
-            document.getElementById("filter-riwayat-bulan").value = curM;
-            document.getElementById("filter-laporan-bulan").value = curM;
-        }
-
         const user = localStorage.getItem("fw_user") || "";
         const capUser = user.charAt(0).toUpperCase() + user.slice(1).toLowerCase();
-        
         if (user && user.toLowerCase() !== "admin") {
-            filterPencatat.innerHTML = `<option value="${capUser}">${capUser}</option>`;
-            filterPencatat.value = capUser;
-            filterPencatat.disabled = true;
-            filterPencatat.classList.add("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
-            
+            if(filterPencatat) {
+                filterPencatat.innerHTML = `<option value="${capUser}">${capUser}</option>`;
+                filterPencatat.value = capUser;
+                filterPencatat.disabled = true;
+                filterPencatat.classList.add("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
+            }
             if(inPencatat) {
                 if(!Array.from(inPencatat.options).some(opt => opt.value === capUser)) {
                     let opt = document.createElement("option"); opt.value = capUser; opt.text = capUser;
@@ -811,16 +772,135 @@
                 inPencatat.disabled = true;
             }
         } else {
-            filterPencatat.disabled = false;
-            filterPencatat.classList.remove("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
-            if(inPencatat) {
-                inPencatat.disabled = false;
+            if(filterPencatat) {
+                filterPencatat.disabled = false;
+                filterPencatat.classList.remove("bg-slate-100", "text-slate-500", "cursor-not-allowed", "dark:bg-slate-800");
+            }
+            if(inPencatat) inPencatat.disabled = false;
+        }
+    }
+
+    function loadDashboardData(isReload = false) {
+        const token = ++dashboardRequestToken;
+        const filterPanjang = document.getElementById("filter-pencatat");
+        const filterBulanEl = document.getElementById("filter-bulan");
+        if(!isReload && filterBulanEl && (!filterBulanEl.value || filterBulanEl.value === "all")) {
+            filterBulanEl.value = new Date().getMonth().toString();
+        }
+        const filterP = (filterPanjang?.value || "all").toString();
+        const filterB = (filterBulanEl?.value || "all").toString();
+
+        if(!isReload) {
+            const cached = localStorage.getItem("fw_dashboard_cache");
+            if(cached) {
+                try {
+                    const cachedRes = JSON.parse(cached);
+                    if(cachedRes.status === "success") processDashboardResponse(cachedRes, false);
+                } catch (e) {
+                    console.warn("Cache dashboard rusak, memuat ulang...");
+                }
             }
         }
-        
-        initRiwayatFilters(); 
-        renderFilteredData(); 
-        refreshActiveTab();
+
+        document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
+
+        fetch(API_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+                action: "getDashboardData",
+                pencatat: filterP,
+                bulan: filterB,
+                user: localStorage.getItem("fw_user") || "Guest"
+            })
+        })
+        .then(res => res.json())
+        .then(res => {
+            if(token !== dashboardRequestToken) return;
+            if(res.status === "success") {
+                localStorage.setItem("fw_dashboard_cache", JSON.stringify(res));
+                processDashboardResponse(res, isReload);
+            } else {
+                alert("Gagal memuat dashboard: " + res.message);
+            }
+            document.getElementById("loader").classList.add("opacity-0", "pointer-events-none");
+        })
+        .catch(err => {
+            console.error("Dashboard Fetch Error:", err);
+            document.getElementById("loader").classList.add("opacity-0", "pointer-events-none");
+            alert("Gagal mengambil data dashboard dari Google Sheet. Periksa koneksi internet dan pastikan sheet REKAP BULANAN tersedia.");
+        });
+    }
+
+    function processDashboardResponse(res, isReload) {
+        dashboardState = res;
+        applyMetadata(res);
+
+        renderDashboardFromState();
+    }
+
+    function renderDashboardFromState() {
+        if(!dashboardState || !dashboardState.summary) return;
+        const summary = dashboardState.summary;
+        const elSaldoAwal = document.getElementById("txt-saldo-awal");
+        const elPengeluaran = document.getElementById("txt-pengeluaran");
+        const elSaldo = document.getElementById("txt-saldo");
+
+        elSaldoAwal.dataset.value = summary.totalPemasukan || 0;
+        elPengeluaran.dataset.value = summary.totalPengeluaran || 0;
+        elSaldo.dataset.value = summary.totalSisaSaldo || 0;
+        updateSaldoVisibility();
+
+        let html = "";
+        (dashboardState.latestTransactions || []).forEach(trx => {
+            const isPengeluaran = (trx.jenis || "").toString().toLowerCase() === 'pengeluaran';
+            html += `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-700/50 last:border-0 select-none transition-colors"><div class="min-w-0 pr-4 flex-1"><p class="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">${trx.kategori || "-"}</p><p class="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">${trx.keterangan || "-"}</p></div><span class="${isPengeluaran ? 'text-rose-500 dark:text-rose-400' : 'text-emerald-500 dark:text-emerald-400'} font-bold text-sm">${isPengeluaran ? '-' : '+'}${formatter.format(trx.nominal)}</span></div>`;
+        });
+        document.getElementById("list-riwayat-singkat").innerHTML = html || `<p class="text-sm text-slate-400 dark:text-slate-500 text-center py-4 select-none">Belum ada transaksi.</p>`;
+        renderDailyChart();
+    }
+
+    function loadTransactionsForHistory(force = false) {
+        if(transactionsLoading) return;
+        if(transactionsLoaded && !force) {
+            renderRiwayatLengkap();
+            return;
+        }
+
+        transactionsLoading = true;
+        document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
+        fetch(API_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ action: "getTransactions" })
+        })
+        .then(res => res.json())
+        .then(res => {
+            if(res.status === "success") {
+                transactionsLoaded = true;
+                processDataResponse(res, true);
+            } else {
+                alert("Gagal memuat riwayat: " + res.message);
+            }
+        })
+        .catch(err => {
+            console.error("History Fetch Error:", err);
+            alert("Gagal mengambil data riwayat dari Google Sheet.");
+        })
+        .finally(() => {
+            transactionsLoading = false;
+            document.getElementById("loader").classList.add("opacity-0", "pointer-events-none");
+        });
+    }
+
+    function processDataResponse(res, isReload) {
+        globalTransactions = res.data || [];
+        globalTransactions.forEach((trx, index) => { trx._originalIndex = index; });
+        applyMetadata(res);
+        initRiwayatFilters();
+        renderRiwayatLengkap();
     }
 
     function initRiwayatFilters() {
@@ -1057,7 +1137,9 @@
         .then(res => {
             if(res.status === "success") {
                 resetInputForm();
-                loadDataFromServer(true);
+                transactionsLoaded = false;
+                globalTransactions = [];
+                loadDashboardData(true);
                 switchTab('home');
             } else {
                 alert("Gagal menyimpan transaksi: " + res.message);
@@ -1081,7 +1163,11 @@
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({ action: "deleteTransaction", row: rowId })
             }).then(res => res.json()).then(res => {
-                if(res.status === "success") { loadDataFromServer(true); } 
+                if(res.status === "success") {
+                    transactionsLoaded = false;
+                    globalTransactions = [];
+                    loadDashboardData(true);
+                } 
                 else { alert("Gagal menghapus: " + res.message); document.getElementById("loader").classList.add("opacity-0", "pointer-events-none"); }
             }).catch(err => {
                 console.error(err);
@@ -1093,228 +1179,100 @@
 
     /* Logika renderFilteredData yang disesuaikan untuk kalkulasi yang lebih rapi */
     function renderFilteredData() {
-      const currentUser = (localStorage.getItem("fw_user") || "").toLowerCase();
-      const rawFilterP = document.getElementById("filter-pencatat").value.toLowerCase();
-      const filterP = (currentUser === "admin") ? rawFilterP : currentUser; 
-      
-      const filterB = document.getElementById("filter-bulan").value;
-      
-      let totalSisaSaldo = 0; 
-      let totalPemasukan = 0; 
-      let totalPengeluaran = 0;
-      
-      globalTransactions.forEach(trx => {
-        const targetDate = trx.tgl;
-        if(!targetDate) return;
-        const d = new Date(targetDate); 
-        if(isNaN(d)) return;
-
-        const m = d.getMonth().toString(); 
-        const n = parseFloat(trx.nominal) || 0;
-        const jenis = (trx.jenis || "").toString().toLowerCase();
-        
-        if (filterP !== "all" && (trx.pencatat || "").toString().toLowerCase() !== filterP) return;
-        
-        // 1. Hitung Total Sisa Saldo (Akumulasi Semua Bulan/Waktu)
-        if (jenis === "pemasukan") {
-            totalSisaSaldo += n;
-        } else if (jenis === "pengeluaran") {
-            totalSisaSaldo -= n;
-        }
-        
-        // 2. Hitung Pemasukan & Pengeluaran HANYA untuk Bulan yang Dipilih
-        if (filterB === "all" || m === filterB) { 
-            if (jenis === "pemasukan") {
-                totalPemasukan += n; 
-            } else if (jenis === "pengeluaran") {
-                totalPengeluaran += n; 
-            }
-        }
-      });
-      
-      const elSaldoAwal = document.getElementById("txt-saldo-awal");
-      const elPengeluaran = document.getElementById("txt-pengeluaran");
-      const elSaldo = document.getElementById("txt-saldo");
-
-      // Set atribut data untuk dipakai toggle hide/show saldo
-      elSaldoAwal.dataset.value = totalPemasukan;
-      elPengeluaran.dataset.value = totalPengeluaran;
-      elSaldo.dataset.value = totalSisaSaldo;
-
-      // Update Tampilan Saldo sesuai status
-      updateSaldoVisibility();
-      
-      let html = "";
-      globalTransactions.filter(t => {
-          const tDate = t.tgl;
-          if(!tDate || isNaN(new Date(tDate))) return false;
-          const matchP = filterP === "all" || (t.pencatat || "").toString().toLowerCase() === filterP;
-          const matchB = filterB === "all" || new Date(tDate).getMonth().toString() === filterB;
-          return matchP && matchB;
-      }).sort((a,b) => {
-          const dateA = new Date(a.tgl);
-          const dateB = new Date(b.tgl);
-          if (dateA.getTime() !== dateB.getTime()) { return dateA - dateB; }
-          return (a._originalIndex || 0) - (b._originalIndex || 0);
-      }).slice(-5).reverse().forEach(trx => {
-        const isPengeluaran = (trx.jenis || "").toString().toLowerCase() === 'pengeluaran';
-        html += `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-700/50 last:border-0 select-none transition-colors"><div class="min-w-0 pr-4 flex-1"><p class="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">${trx.kategori || "-"}</p><p class="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">${trx.keterangan || "-"}</p></div><span class="${isPengeluaran ? 'text-rose-500 dark:text-rose-400' : 'text-emerald-500 dark:text-emerald-400'} font-bold text-sm">${isPengeluaran ? '-' : '+'}${formatter.format(trx.nominal)}</span></div>`;
-      });
-      document.getElementById("list-riwayat-singkat").innerHTML = html || `<p class="text-sm text-slate-400 dark:text-slate-500 text-center py-4 select-none">Belum ada transaksi.</p>`;
-      renderDailyChart();
+        loadDashboardData();
     }
 
     function renderDailyChart() {
-      const currentUser = (localStorage.getItem("fw_user") || "").toLowerCase();
-      const rawFilterP = document.getElementById("filter-pencatat").value.toLowerCase();
-      const filterP = (currentUser === "admin") ? rawFilterP : currentUser; 
+        const labels = [];
+        const data = (dashboardState && dashboardState.dailyExpenses) ? dashboardState.dailyExpenses : [0,0,0,0,0,0,0];
+        const today = new Date();
+        for(let i = 6; i >= 0; i--) {
+            const d = new Date(); d.setDate(today.getDate() - i);
+            labels.push(d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }));
+        }
 
-      const labels = []; const data = []; const today = new Date();
-      for(let i = 6; i >= 0; i--) {
-        const d = new Date(); d.setDate(today.getDate() - i);
-        labels.push(d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }));
-        let ds = 0;
-        globalTransactions.forEach(trx => {
-          const targetDate = trx.tgl;
-          if(!targetDate) return;
-          const tD = new Date(targetDate);
-          if(isNaN(tD)) return;
-          const matchPencatat = (filterP === "all" || (trx.pencatat || "").toString().toLowerCase() === filterP);
-          
-          if (tD.getDate() === d.getDate() && tD.getMonth() === d.getMonth() && tD.getFullYear() === d.getFullYear() && matchPencatat && (trx.jenis || "").toString().toLowerCase() === 'pengeluaran') {
-              ds += parseFloat(trx.nominal) || 0;
-          }
+        if(chartInstance) chartInstance.destroy();
+        chartInstance = new Chart(document.getElementById('canvasTrenSaldo'), {
+            type: 'line',
+            data: { labels: labels, datasets: [{ label: 'Pengeluaran 7 Hari Terakhir', data: data, borderColor: '#4f46e5', backgroundColor: 'rgba(79, 70, 229, 0.1)', fill: true, tension: 0.4, pointRadius: 6, pointBackgroundColor: '#4f46e5' }] },
+            options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, elements: { point: { hitRadius: 25 } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
         });
-        data.push(ds);
-      }
-      
-      if(chartInstance) chartInstance.destroy();
-      chartInstance = new Chart(document.getElementById('canvasTrenSaldo'), {
-        type: 'line',
-        data: { labels: labels, datasets: [{ label: 'Pengeluaran 7 Hari Terakhir', data: data, borderColor: '#4f46e5', backgroundColor: 'rgba(79, 70, 229, 0.1)', fill: true, tension: 0.4, pointRadius: 6, pointBackgroundColor: '#4f46e5' }] },
-        options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, elements: { point: { hitRadius: 25 } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
-      });
     }
 
     function renderLaporanKeuangan() {
         const currentUser = (localStorage.getItem("fw_user") || "").toLowerCase();
-        const rawFilterP = document.getElementById("filter-pencatat").value.toLowerCase();
-        const filterP = (currentUser === "admin") ? rawFilterP : currentUser; 
-        
+        const filterP = (document.getElementById("filter-pencatat").value || "all").toString();
         const filterB = document.getElementById("filter-laporan-bulan").value;
         const filterT = document.getElementById("filter-laporan-tahun").value;
-        
-        let totalPemasukan = 0; let totalPengeluaran = 0; const kategoriMap = {};
-        
-        globalTransactions.forEach(trx => {
-            const targetDate = trx.tgl;
-            if(!targetDate) return;
-            const date = new Date(targetDate);
-            if(isNaN(date)) return;
-            
-            const matchPencatat = (filterP === "all" || (trx.pencatat || "").toString().toLowerCase() === filterP);
-            const matchBulan = (filterB === "all" || date.getMonth().toString() === filterB);
-            const matchTahun = (filterT === "all" || date.getFullYear().toString() === filterT);
-            
-            if(matchPencatat && matchBulan && matchTahun) {
-                const nominal = parseFloat(trx.nominal) || 0;
-                const jenis = (trx.jenis || "").toString().toLowerCase();
-                
-                if(jenis === 'pemasukan') { totalPemasukan += nominal; } 
-                else if(jenis === 'pengeluaran') {
-                    totalPengeluaran += nominal;
-                    const kat = trx.kategori ? trx.kategori.toString().trim() : "Lainnya";
-                    kategoriMap[kat] = (kategoriMap[kat] || 0) + nominal;
-                }
-            }
-        });
-        
-        document.getElementById("rep-total-masuk").innerText = formatter.format(totalPemasukan);
-        document.getElementById("rep-total-keluar").innerText = formatter.format(totalPengeluaran);
-        
-        const katLabels = Object.keys(kategoriMap);
-        const katData = Object.values(kategoriMap);
-        
-        if(chartDoughnutInstance) chartDoughnutInstance.destroy();
-        if(katData.length > 0) {
-            document.getElementById("canvasDistribusiKategori").classList.remove("hidden");
-            document.getElementById("no-data-doughnut").classList.add("hidden");
-            chartDoughnutInstance = new Chart(document.getElementById('canvasDistribusiKategori'), {
-                type: 'doughnut',
-                data: { labels: katLabels, datasets: [{ data: katData, backgroundColor: ['#4f46e5', '#10b981', '#f43f5e', '#f59e0b', '#06b6d4', '#8b5cf6', '#ec4899', '#64748b'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Plus Jakarta Sans', size: 11 } } } } }
-            });
-        } else {
-            document.getElementById("canvasDistribusiKategori").classList.add("hidden");
-            document.getElementById("no-data-doughnut").classList.remove("hidden");
-        }
-        
-        const targetYear = filterT === "all" ? new Date().getFullYear().toString() : filterT;
-        const bulananIn = Array(12).fill(0); const bulananOut = Array(12).fill(0);
-        
-        globalTransactions.forEach(trx => {
-            const targetDate = trx.tgl;
-            if(!targetDate) return;
-            const date = new Date(targetDate);
-            if(isNaN(date)) return;
 
-            if(date.getFullYear().toString() === targetYear) {
-                const matchPencatat = (filterP === "all" || (trx.pencatat || "").toString().toLowerCase() === filterP);
-                if(matchPencatat) {
-                    const m = date.getMonth(); const n = parseFloat(trx.nominal) || 0;
-                    const jenis = (trx.jenis || "").toString().toLowerCase();
-                    if(jenis === 'pemasukan') bulananIn[m] += n;
-                    else if(jenis === 'pengeluaran') bulananOut[m] += n;
-                }
+        document.getElementById("loader").classList.remove("opacity-0", "pointer-events-none");
+        fetch(API_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+                action: "getReportData",
+                pencatat: filterP,
+                bulan: filterB,
+                tahun: filterT,
+                user: localStorage.getItem("fw_user") || "Guest"
+            })
+        })
+        .then(res => res.json())
+        .then(res => {
+            if(res.status !== "success") {
+                alert("Gagal memuat laporan: " + res.message);
+                return;
             }
-        });
-        
-        const namaBulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
-        if(chartTrendInstance) chartTrendInstance.destroy();
-        chartTrendInstance = new Chart(document.getElementById('canvasTrenBulanan'), {
-            type: 'bar',
-            data: { labels: namaBulan, datasets: [{ label: 'Pemasukan', data: bulananIn, backgroundColor: 'rgba(16, 185, 129, 0.85)', borderRadius: 6 }, { label: 'Pengeluaran', data: bulananOut, backgroundColor: 'rgba(244, 63, 94, 0.85)', borderRadius: 6 }] },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 10 } } } }, plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'Plus Jakarta Sans', size: 11 } } } } }
-        });
-        
-        const compSection = document.getElementById("admin-comparison-section");
-        if(currentUser === "admin") {
-            compSection.classList.remove("hidden");
-            const pencatatMap = {}; 
-            globalTransactions.forEach(trx => {
-                const targetDate = trx.tgl;
-                if(!targetDate) return;
-                const date = new Date(targetDate);
-                if(isNaN(date)) return;
 
-                const matchBulan = (filterB === "all" || date.getMonth().toString() === filterB);
-                const matchTahun = (filterT === "all" || date.getFullYear().toString() === filterT);
-                
-                if(matchBulan && matchTahun) {
-                    const pencatat = trx.pencatat ? trx.pencatat.toString().trim() : "Lainnya";
-                    const n = parseFloat(trx.nominal) || 0;
-                    const jenis = (trx.jenis || "").toString().toLowerCase();
-                    
-                    if(!pencatatMap[pencatat]) pencatatMap[pencatat] = { in: 0, out: 0 };
-                    
-                    if(jenis === "pemasukan") pencatatMap[pencatat].in += n;
-                    else if(jenis === "pengeluaran") pencatatMap[pencatat].out += n;
-                }
-            });
-            
-            const compLabels = Object.keys(pencatatMap);
-            const dataIn = compLabels.map(key => pencatatMap[key].in);
-            const dataOut = compLabels.map(key => pencatatMap[key].out);
-            
-            if(chartCompareInstance) chartCompareInstance.destroy();
-            chartCompareInstance = new Chart(document.getElementById('canvasKomparasiPasangan'), {
+            document.getElementById("rep-total-masuk").innerText = formatter.format(res.summary.totalPemasukan || 0);
+            document.getElementById("rep-total-keluar").innerText = formatter.format(res.summary.totalPengeluaran || 0);
+
+            const katLabels = res.categoryLabels || [];
+            const katData = res.categoryData || [];
+            if(chartDoughnutInstance) chartDoughnutInstance.destroy();
+            if(katData.length > 0) {
+                document.getElementById("canvasDistribusiKategori").classList.remove("hidden");
+                document.getElementById("no-data-doughnut").classList.add("hidden");
+                chartDoughnutInstance = new Chart(document.getElementById('canvasDistribusiKategori'), {
+                    type: 'doughnut',
+                    data: { labels: katLabels, datasets: [{ data: katData, backgroundColor: ['#4f46e5', '#10b981', '#f43f5e', '#f59e0b', '#06b6d4', '#8b5cf6', '#ec4899', '#64748b'], borderWidth: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Plus Jakarta Sans', size: 11 } } } } }
+                });
+            } else {
+                document.getElementById("canvasDistribusiKategori").classList.add("hidden");
+                document.getElementById("no-data-doughnut").classList.remove("hidden");
+            }
+
+            const namaBulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+            if(chartTrendInstance) chartTrendInstance.destroy();
+            chartTrendInstance = new Chart(document.getElementById('canvasTrenBulanan'), {
                 type: 'bar',
-                data: { labels: compLabels, datasets: [{ label: 'Pemasukan', data: dataIn, backgroundColor: '#10b981', borderRadius: 6 }, { label: 'Pengeluaran', data: dataOut, backgroundColor: '#f43f5e', borderRadius: 6 }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, ticks: { font: { size: 10 } } }, y: { grid: { display: false }, ticks: { font: { fontStyle: 'bold' } } } }, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } } }
+                data: { labels: namaBulan, datasets: [{ label: 'Pemasukan', data: res.trendIn || Array(12).fill(0), backgroundColor: 'rgba(16, 185, 129, 0.85)', borderRadius: 6 }, { label: 'Pengeluaran', data: res.trendOut || Array(12).fill(0), backgroundColor: 'rgba(244, 63, 94, 0.85)', borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 10 } } } }, plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'Plus Jakarta Sans', size: 11 } } } } }
             });
-        } else {
-            compSection.classList.add("hidden");
-        }
+
+            const compSection = document.getElementById("admin-comparison-section");
+            if(currentUser === "admin") {
+                compSection.classList.remove("hidden");
+                if(chartCompareInstance) chartCompareInstance.destroy();
+                chartCompareInstance = new Chart(document.getElementById('canvasKomparasiPasangan'), {
+                    type: 'bar',
+                    data: { labels: res.comparisonLabels || [], datasets: [{ label: 'Pemasukan', data: res.comparisonIn || [], backgroundColor: '#10b981', borderRadius: 6 }, { label: 'Pengeluaran', data: res.comparisonOut || [], backgroundColor: '#f43f5e', borderRadius: 6 }] },
+                    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, ticks: { font: { size: 10 } } }, y: { grid: { display: false }, ticks: { font: { fontStyle: 'bold' } } } }, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } } }
+                });
+            } else {
+                compSection.classList.add("hidden");
+                if(chartCompareInstance) { chartCompareInstance.destroy(); chartCompareInstance = null; }
+            }
+        })
+        .catch(err => {
+            console.error("Report Fetch Error:", err);
+            alert("Gagal mengambil data laporan dari Google Sheet.");
+        })
+        .finally(() => {
+            document.getElementById("loader").classList.add("opacity-0", "pointer-events-none");
+        });
     }
 
     window.onload = () => {
@@ -1324,7 +1282,7 @@
             document.getElementById("app-section").classList.remove("hidden");
             document.getElementById("bottom-nav").classList.remove("hidden");
             document.getElementById("btn-reload").classList.remove("hidden");
-            loadDataFromServer();
+            loadDashboardData();
         } else {
             document.getElementById("login-section").classList.remove("hidden");
             document.getElementById("loader").classList.add("opacity-0", "pointer-events-none");
