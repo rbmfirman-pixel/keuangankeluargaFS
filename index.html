@@ -464,7 +464,7 @@
     
     const formatter = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 });
 
-    // Upgrade: dashboard ringan + server-side pagination riwayat
+    // Upgrade: dashboard ringan + server-side pagination riwayat + persistent browser cache
     let dashboardState = null;
     let dashboardRequestToken = 0;
     let historyItems = [];
@@ -707,12 +707,14 @@
         else loader.classList.add('opacity-0', 'pointer-events-none');
     }
 
+    // Persistent browser cache: tetap tersedia walaupun Chrome ditutup.
+    // Data tetap dianggap valid hanya jika versi server sama.
     function removeSessionCacheByPrefix(prefix) {
         try {
-            Object.keys(sessionStorage).forEach(key => {
-                if(key.indexOf(prefix) === 0) sessionStorage.removeItem(key);
+            Object.keys(localStorage).forEach(key => {
+                if(key.indexOf(prefix) === 0) localStorage.removeItem(key);
             });
-        } catch(e) { console.warn('Session cache cleanup:', e); }
+        } catch(e) { console.warn('Persistent cache cleanup:', e); }
     }
 
     function invalidateDataCaches() {
@@ -728,22 +730,40 @@
         removeSessionCacheByPrefix(DASHBOARD_CACHE_PREFIX);
         removeSessionCacheByPrefix(REPORT_CACHE_PREFIX);
         removeSessionCacheByPrefix(HISTORY_CACHE_PREFIX);
+        try { localStorage.removeItem(SESSION_VERSION_KEY); } catch(e) {}
         try { sessionStorage.removeItem(SESSION_VERSION_KEY); } catch(e) {}
+    }
+
+    function migrateLegacySessionCache(key) {
+        try {
+            const existing = localStorage.getItem(key);
+            if(existing) return existing;
+            const legacy = sessionStorage.getItem(key);
+            if(legacy){
+                localStorage.setItem(key, legacy);
+                return legacy;
+            }
+        } catch(e) {}
+        return null;
     }
 
     function getSessionJson(key) {
         try {
-            const raw = sessionStorage.getItem(key);
+            const raw = migrateLegacySessionCache(key);
             return raw ? JSON.parse(raw) : null;
         } catch(e) {
-            console.warn('Session cache diabaikan:', e);
+            console.warn('Persistent cache diabaikan:', e);
             return null;
         }
     }
 
     function setSessionJson(key, value) {
-        try { sessionStorage.setItem(key, JSON.stringify(value)); }
-        catch(e) { console.warn('Session cache gagal disimpan:', e); }
+        try { localStorage.setItem(key, JSON.stringify(value)); }
+        catch(e) {
+            console.warn('Persistent cache gagal disimpan:', e);
+            // Fallback: cache sesi agar aplikasi tetap dapat berjalan jika storage penuh.
+            try { sessionStorage.setItem(key, JSON.stringify(value)); } catch(ignore) {}
+        }
     }
 
     function getReportCacheKey() {
@@ -765,12 +785,12 @@
     }
 
     function getCachedDataVersion() {
-        try { return sessionStorage.getItem(SESSION_VERSION_KEY) || ''; }
+        try { return localStorage.getItem(SESSION_VERSION_KEY) || ''; }
         catch(e) { return ''; }
     }
 
     function setCachedDataVersion(version) {
-        try { sessionStorage.setItem(SESSION_VERSION_KEY, String(version || '')); }
+        try { localStorage.setItem(SESSION_VERSION_KEY, String(version || '')); }
         catch(e) {}
     }
 
@@ -1425,8 +1445,9 @@
             document.getElementById("bottom-nav").classList.remove("hidden");
             document.getElementById("btn-reload").classList.remove("hidden");
 
-            // Tampilkan cache sesi langsung bila ada, lalu lakukan ping ringan
-            // untuk mengetahui apakah data di server berubah.
+            // Tampilkan cache persisten langsung bila ada. Setelah itu lakukan
+            // ping ringan di background untuk mengetahui apakah data server berubah.
+            // Tidak menampilkan loader saat pengecekan agar buka ulang dari HP terasa instan.
             const cachedDashboard=getSessionJson(getDashboardCacheKey());
             if(cachedDashboard && cachedDashboard.status==="success") {
                 cachedDashboard._cacheKey=getDashboardCacheKey();
