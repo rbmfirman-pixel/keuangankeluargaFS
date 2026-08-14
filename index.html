@@ -472,6 +472,8 @@
     let historyOffset = 0;
     let historyLoading = false;
     let historyLoaded = false;
+    // V7: token untuk membatalkan hasil request Riwayat lama setelah CRUD/cache invalidation
+    let historyRequestToken = 0;
     const DASHBOARD_CACHE_PREFIX = 'fw_dashboard_session_v5_';
     const REPORT_CACHE_PREFIX = 'fw_report_session_v5_';
     const HISTORY_CACHE_PREFIX = 'fw_history_session_v5_';
@@ -718,6 +720,10 @@
     }
 
     function invalidateDataCaches() {
+        // V7: batalkan hasil request Riwayat yang masih berjalan agar tidak
+        // menulis kembali cache lama setelah transaksi berubah.
+        historyRequestToken++;
+        dashboardRequestToken++;
         dashboardState = null;
         reportState = null;
         historyLoaded = false;
@@ -999,23 +1005,30 @@
     }
 
     function loadTransactionsForHistory(reset=true){
-        if(historyLoading) return;
+        // V7: setiap pemanggilan baru mendapat token sendiri. Bila ada request
+        // lama yang selesai setelah transaksi berubah, hasilnya diabaikan.
+        if(historyLoading && !reset) return;
 
+        const requestToken = ++historyRequestToken;
         const cacheKey=getHistoryCacheKey();
-        if(reset && !historyLoading) {
-            const cached=getSessionJson(cacheKey);
-            if(cached && cached.status==="success") {
-                historyItems=cached.data||[];
-                historyTotal=Number(cached.total||0);
-                historyOffset=historyItems.length;
-                historyLoaded=true;
-                if(cached.version) setCachedDataVersion(cached.version);
-                applyMetadata(cached);
-                updateHistoryFilterOptions(cached);
-                renderRiwayatLengkap();
-                setLoader(false);
-                return;
-            }
+        const cached=getSessionJson(cacheKey);
+        const knownVersion=getCachedDataVersion();
+
+        // Cache Riwayat hanya boleh dipakai bila version-nya masih cocok dengan
+        // version data yang terakhir diketahui browser. Cache tanpa version
+        // tetap boleh dipakai sebagai fallback lama.
+        if(reset && cached && cached.status==="success" &&
+           (!knownVersion || !cached.version || String(cached.version)===String(knownVersion))) {
+            historyItems=cached.data||[];
+            historyTotal=Number(cached.total||0);
+            historyOffset=historyItems.length;
+            historyLoaded=true;
+            if(cached.version) setCachedDataVersion(cached.version);
+            applyMetadata(cached);
+            updateHistoryFilterOptions(cached);
+            renderRiwayatLengkap();
+            setLoader(false);
+            return;
         }
 
         historyLoading=true;
@@ -1025,6 +1038,8 @@
         const year=document.getElementById("filter-riwayat-tahun")?.value||"all";
         const category=document.getElementById("filter-riwayat-kategori")?.value||"all";
         const search=document.getElementById("search-riwayat")?.value||"";
+        const requestedOffset=historyOffset;
+
         jsonpRequest('getTransactionsPage',{
             pencatat:getClientEffectivePencatat(),
             bulan:month,
@@ -1032,9 +1047,11 @@
             kategori:category,
             search:search,
             limit:50,
-            offset:historyOffset,
+            offset:requestedOffset,
             user:localStorage.getItem("fw_user")||"Guest"
         }).then(res=>{
+            // Request Riwayat ini sudah basi? Jangan pernah menulis state/cache lama.
+            if(requestToken!==historyRequestToken) return;
             if(!res || res.status!=="success") throw new Error(res?.message||"Gagal memuat riwayat");
             applyMetadata(res);
             if(reset) historyItems=res.data||[]; else historyItems=historyItems.concat(res.data||[]);
@@ -1053,9 +1070,12 @@
             setSessionJson(cacheKey,currentState);
             renderRiwayatLengkap();
         }).catch(err=>{
+            // Error dari request lama tidak boleh mengganggu state baru.
+            if(requestToken!==historyRequestToken) return;
             console.error("History Read Error:",err);
             alert(err.message||"Gagal mengambil data riwayat dari Google Sheet.");
         }).finally(()=>{
+            if(requestToken!==historyRequestToken) return;
             historyLoading=false;
             setLoader(false);
         });
