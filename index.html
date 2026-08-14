@@ -472,8 +472,10 @@
     let historyOffset = 0;
     let historyLoading = false;
     let historyLoaded = false;
-    const DASHBOARD_CACHE_PREFIX = 'fw_dashboard_cache_v3_';
-    const REPORT_CACHE_PREFIX = 'fw_report_cache_v3_';
+    const DASHBOARD_CACHE_PREFIX = 'fw_dashboard_session_v5_';
+    const REPORT_CACHE_PREFIX = 'fw_report_session_v5_';
+    const HISTORY_CACHE_PREFIX = 'fw_history_session_v5_';
+    const SESSION_VERSION_KEY = 'fw_data_version_v5';
     let dashboardLoading = false;
     let reportState = null;
     let reportLoading = false;
@@ -705,6 +707,14 @@
         else loader.classList.add('opacity-0', 'pointer-events-none');
     }
 
+    function removeSessionCacheByPrefix(prefix) {
+        try {
+            Object.keys(sessionStorage).forEach(key => {
+                if(key.indexOf(prefix) === 0) sessionStorage.removeItem(key);
+            });
+        } catch(e) { console.warn('Session cache cleanup:', e); }
+    }
+
     function invalidateDataCaches() {
         dashboardState = null;
         reportState = null;
@@ -712,11 +722,28 @@
         historyItems = [];
         historyTotal = 0;
         historyOffset = 0;
-        Object.keys(localStorage).forEach(key => {
-            if(key.indexOf('fw_dashboard_cache_') === 0 || key.indexOf('fw_report_cache_') === 0) {
-                localStorage.removeItem(key);
-            }
-        });
+        dashboardLoading = false;
+        reportLoading = false;
+        historyLoading = false;
+        removeSessionCacheByPrefix(DASHBOARD_CACHE_PREFIX);
+        removeSessionCacheByPrefix(REPORT_CACHE_PREFIX);
+        removeSessionCacheByPrefix(HISTORY_CACHE_PREFIX);
+        try { sessionStorage.removeItem(SESSION_VERSION_KEY); } catch(e) {}
+    }
+
+    function getSessionJson(key) {
+        try {
+            const raw = sessionStorage.getItem(key);
+            return raw ? JSON.parse(raw) : null;
+        } catch(e) {
+            console.warn('Session cache diabaikan:', e);
+            return null;
+        }
+    }
+
+    function setSessionJson(key, value) {
+        try { sessionStorage.setItem(key, JSON.stringify(value)); }
+        catch(e) { console.warn('Session cache gagal disimpan:', e); }
     }
 
     function getReportCacheKey() {
@@ -725,6 +752,26 @@
         const bulan = document.getElementById('filter-laporan-bulan')?.value || 'all';
         const tahun = document.getElementById('filter-laporan-tahun')?.value || 'all';
         return REPORT_CACHE_PREFIX + [user, pencatat, bulan, tahun].join('_');
+    }
+
+    function getHistoryCacheKey() {
+        const user=(localStorage.getItem('fw_user')||'Guest').toLowerCase();
+        const pencatat=getClientEffectivePencatat().toLowerCase();
+        const month=document.getElementById('filter-riwayat-bulan')?.value||'all';
+        const year=document.getElementById('filter-riwayat-tahun')?.value||'all';
+        const category=document.getElementById('filter-riwayat-kategori')?.value||'all';
+        const search=(document.getElementById('search-riwayat')?.value||'').trim().toLowerCase();
+        return HISTORY_CACHE_PREFIX + [user,pencatat,month,year,category,search].join('_');
+    }
+
+    function getCachedDataVersion() {
+        try { return sessionStorage.getItem(SESSION_VERSION_KEY) || ''; }
+        catch(e) { return ''; }
+    }
+
+    function setCachedDataVersion(version) {
+        try { sessionStorage.setItem(SESSION_VERSION_KEY, String(version || '')); }
+        catch(e) {}
     }
 
     function togglePassword() { const p = document.getElementById("password"); const i = document.getElementById("eye-icon"); if(p.type === "password") { p.type = "text"; i.innerText = "🙊"; } else { p.type = "password"; i.innerText = "🙈"; } }
@@ -761,7 +808,7 @@
         }
     }
 
-            function switchTab(tab) {
+    function switchTab(tab) {
         const views = ['home', 'riwayat', 'input', 'laporan', 'settings'];
         const titles = { 'home': 'Dashboard', 'riwayat': 'Riwayat Transaksi', 'input': 'Input Transaksi', 'laporan': 'Laporan Keuangan', 'settings': 'Pengaturan' };
         views.forEach(v => {
@@ -783,6 +830,7 @@
         });
         document.getElementById("header-title").innerText = titles[tab] || "FamilyWealth";
 
+        // Pindah menu tidak melakukan request jika state sudah tersedia.
         if(tab === 'home') {
             if(dashboardState && !dashboardLoading) renderDashboardFromState();
             else if(!dashboardLoading) loadDashboardData(false);
@@ -802,7 +850,7 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-            function refreshActiveTab() {
+    function refreshActiveTab() {
         if(!document.getElementById("view-riwayat").classList.contains("hidden")) {
             if(historyLoaded) renderRiwayatLengkap();
         }
@@ -860,7 +908,7 @@
         return DASHBOARD_CACHE_PREFIX+[user,pencatat,bulan].join("_");
     }
 
-        function loadDashboardData(isReload=false) {
+    function loadDashboardData(isReload=false) {
         const bulanEl=document.getElementById("filter-bulan");
         if(bulanEl && (!bulanEl.value || bulanEl.value==="all")) bulanEl.value=new Date().getMonth().toString();
         const filterP=getClientEffectivePencatat();
@@ -874,31 +922,29 @@
         if(dashboardLoading && !isReload) return;
 
         if(!isReload) {
-            const cached=localStorage.getItem(cacheKey);
-            if(cached) {
-                try {
-                    const cachedRes=JSON.parse(cached);
-                    if(cachedRes && cachedRes.status==="success") {
-                        cachedRes._cacheKey=cacheKey;
-                        processDashboardResponse(cachedRes,false);
-                        return;
-                    }
-                } catch(e) { console.warn("Cache dashboard diabaikan:",e); }
+            const cached=getSessionJson(cacheKey);
+            if(cached && cached.status==="success") {
+                cached._cacheKey=cacheKey;
+                if(cached.version) setCachedDataVersion(cached.version);
+                processDashboardResponse(cached,false);
+                setLoader(false);
+                return;
             }
         }
 
         dashboardLoading=true;
         setLoader(true);
         const token=++dashboardRequestToken;
-        jsonpRequest('getDashboardData', {
-            pencatat: filterP,
-            bulan: filterB,
-            user: localStorage.getItem("fw_user")||"Guest"
+        jsonpRequest('getDashboardData',{
+            pencatat:filterP,
+            bulan:filterB,
+            user:localStorage.getItem("fw_user")||"Guest"
         }).then(res=>{
             if(token!==dashboardRequestToken) return;
             if(res && res.status==="success") {
                 res._cacheKey=cacheKey;
-                localStorage.setItem(cacheKey,JSON.stringify(res));
+                if(res.version) setCachedDataVersion(res.version);
+                setSessionJson(cacheKey,res);
                 processDashboardResponse(res,isReload);
             } else {
                 throw new Error(res?.message||"Gagal memuat dashboard");
@@ -912,8 +958,9 @@
         });
     }
 
-        function processDashboardResponse(res,isReload){
+    function processDashboardResponse(res,isReload){
         dashboardState=res;
+        if(res.version) setCachedDataVersion(res.version);
         applyMetadata(res);
         renderDashboardFromState();
     }
@@ -931,8 +978,26 @@
         renderDailyChart();
     }
 
-        function loadTransactionsForHistory(reset=true){
+    function loadTransactionsForHistory(reset=true){
         if(historyLoading) return;
+
+        const cacheKey=getHistoryCacheKey();
+        if(reset && !historyLoading) {
+            const cached=getSessionJson(cacheKey);
+            if(cached && cached.status==="success") {
+                historyItems=cached.data||[];
+                historyTotal=Number(cached.total||0);
+                historyOffset=historyItems.length;
+                historyLoaded=true;
+                if(cached.version) setCachedDataVersion(cached.version);
+                applyMetadata(cached);
+                updateHistoryFilterOptions(cached);
+                renderRiwayatLengkap();
+                setLoader(false);
+                return;
+            }
+        }
+
         historyLoading=true;
         if(reset){historyOffset=0;historyItems=[];}
         setLoader(true);
@@ -955,20 +1020,17 @@
             if(reset) historyItems=res.data||[]; else historyItems=historyItems.concat(res.data||[]);
             historyTotal=Number(res.total||0);
             historyLoaded=true;
-            if(res.years){
-                const sel=document.getElementById("filter-riwayat-tahun");
-                const current=sel.value;
-                sel.innerHTML='<option value="all">Semua Tahun</option>';
-                res.years.forEach(y=>{let o=document.createElement("option");o.value=y;o.text=y;sel.appendChild(o);});
-                if(Array.from(sel.options).some(o=>o.value===current))sel.value=current;
-            }
-            if(res.categoriesFilter){
-                const sel=document.getElementById("filter-riwayat-kategori");
-                const current=sel.value;
-                sel.innerHTML='<option value="all">Semua Kategori</option>';
-                res.categoriesFilter.forEach(k=>{let o=document.createElement("option");o.value=k.toLowerCase();o.text=k;sel.appendChild(o);});
-                if(Array.from(sel.options).some(o=>o.value===current))sel.value=current;
-            }
+            historyOffset=historyItems.length;
+            if(res.version) setCachedDataVersion(res.version);
+            updateHistoryFilterOptions(res);
+
+            const currentState={
+                status:"success",
+                version:res.version||getCachedDataVersion(),
+                data:historyItems,
+                total:historyTotal
+            };
+            setSessionJson(cacheKey,currentState);
             renderRiwayatLengkap();
         }).catch(err=>{
             console.error("History Read Error:",err);
@@ -979,13 +1041,30 @@
         });
     }
 
-        function loadDataFromServer(isReload=false) {
+    function updateHistoryFilterOptions(res) {
+        if(res.years) {
+            const sel=document.getElementById("filter-riwayat-tahun");
+            const current=sel.value;
+            sel.innerHTML='<option value="all">Semua Tahun</option>';
+            res.years.forEach(y=>{let o=document.createElement('option');o.value=y;o.text=y;sel.appendChild(o);});
+            if(Array.from(sel.options).some(o=>o.value===current)) sel.value=current;
+        }
+        if(res.categoriesFilter) {
+            const sel=document.getElementById("filter-riwayat-kategori");
+            const current=sel.value;
+            sel.innerHTML='<option value="all">Semua Kategori</option>';
+            res.categoriesFilter.forEach(k=>{let o=document.createElement('option');o.value=k.toLowerCase();o.text=k;sel.appendChild(o);});
+            if(Array.from(sel.options).some(o=>o.value===current)) sel.value=current;
+        }
+    }
+
+    function loadDataFromServer(isReload=false) {
         if(!isReload) {
             if(!dashboardState && !dashboardLoading) loadDashboardData(false);
             return;
         }
         invalidateDataCaches();
-        const activeView = ['home','riwayat','input','laporan','settings'].find(v=>!document.getElementById(`view-${v}`).classList.contains('hidden')) || 'home';
+        const activeView=['home','riwayat','input','laporan','settings'].find(v=>!document.getElementById(`view-${v}`).classList.contains('hidden')) || 'home';
         if(activeView==='riwayat') loadTransactionsForHistory(true);
         else if(activeView==='laporan') loadReportData(true);
         else loadDashboardData(true);
@@ -1185,8 +1264,7 @@
         .then(res => {
             if(res.status === "success") {
                 resetInputForm();
-                historyLoaded = false;
-                historyItems = [];
+                invalidateDataCaches();
                 loadDashboardData(true);
                 switchTab('home');
             } else {
@@ -1211,7 +1289,7 @@
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({ action: "deleteTransaction", row: rowId })
             }).then(res => res.json()).then(res => {
-                if(res.status === "success") { historyLoaded = false; historyItems = []; loadDashboardData(true); if(!document.getElementById("view-riwayat").classList.contains("hidden")) loadTransactionsForHistory(true); } 
+                if(res.status === "success") { invalidateDataCaches(); loadDashboardData(true); if(!document.getElementById("view-riwayat").classList.contains("hidden")) loadTransactionsForHistory(true); } 
                 else { alert("Gagal menghapus: " + res.message); document.getElementById("loader").classList.add("opacity-0", "pointer-events-none"); }
             }).catch(err => {
                 console.error(err);
@@ -1279,18 +1357,27 @@
         if(!isReload && reportState && reportState._cacheKey===key){renderLaporanKeuanganFromState();return;}
         if(reportLoading && !isReload) return;
         if(!isReload){
-            const cached=localStorage.getItem(key);
-            if(cached){
-                try{const r=JSON.parse(cached);if(r.status==="success"){r._cacheKey=key;applyReportState(r);return;}}catch(e){console.warn('Cache laporan diabaikan:',e);}
+            const cached=getSessionJson(key);
+            if(cached && cached.status==="success"){
+                cached._cacheKey=key;
+                if(cached.version) setCachedDataVersion(cached.version);
+                applyReportState(cached);
+                return;
             }
         }
+
         reportLoading=true;
         setLoader(true);
-        jsonpRequest('getReportData',{pencatat:getClientEffectivePencatat(),bulan:document.getElementById('filter-laporan-bulan').value,tahun:document.getElementById('filter-laporan-tahun').value,user:localStorage.getItem('fw_user')||'Guest'})
-        .then(res=>{
+        jsonpRequest('getReportData',{
+            pencatat:getClientEffectivePencatat(),
+            bulan:document.getElementById('filter-laporan-bulan').value,
+            tahun:document.getElementById('filter-laporan-tahun').value,
+            user:localStorage.getItem('fw_user')||'Guest'
+        }).then(res=>{
             if(!res||res.status!=="success") throw new Error(res?.message||"Gagal memuat laporan");
             res._cacheKey=key;
-            localStorage.setItem(key,JSON.stringify(res));
+            if(res.version) setCachedDataVersion(res.version);
+            setSessionJson(key,res);
             applyReportState(res);
             if(res.years){
                 const selectYear=document.getElementById("filter-laporan-tahun");
@@ -1300,15 +1387,30 @@
                 if(Array.from(selectYear.options).some(o=>o.value===currentYear)) selectYear.value=currentYear;
                 else if(Array.from(selectYear.options).some(o=>o.value===new Date().getFullYear().toString())) selectYear.value=new Date().getFullYear().toString();
                 reportState._cacheKey=getReportCacheKey();
-                localStorage.setItem(reportState._cacheKey,JSON.stringify(reportState));
+                setSessionJson(reportState._cacheKey,reportState);
             }
-        })
-        .catch(err=>{console.error('Report Read Error:',err);alert(err.message||'Gagal mengambil data laporan dari Google Sheet.');})
-        .finally(()=>{reportLoading=false;setLoader(false);});
+        }).catch(err=>{
+            console.error('Report Read Error:',err);
+            alert(err.message||'Gagal mengambil data laporan dari Google Sheet.');
+        }).finally(()=>{reportLoading=false;setLoader(false);});
     }
 
             function renderLaporanKeuangan() {
         loadReportData(false);
+    }
+
+    function checkServerVersionAndRefreshIfNeeded() {
+        return jsonpRequest('ping',{},10000).then(res=>{
+            if(!res || res.status!=="success") return;
+            const serverVersion=String(res.version||'');
+            const clientVersion=getCachedDataVersion();
+            if(clientVersion && serverVersion===clientVersion) return;
+            if(serverVersion) setCachedDataVersion(serverVersion);
+            invalidateDataCaches();
+            if(localStorage.getItem("fw_user")) loadDashboardData(true);
+        }).catch(err=>{
+            console.warn('Version check skipped:',err);
+        });
     }
 
     window.onload = () => {
@@ -1322,12 +1424,24 @@
             document.getElementById("app-section").classList.remove("hidden");
             document.getElementById("bottom-nav").classList.remove("hidden");
             document.getElementById("btn-reload").classList.remove("hidden");
-            loadDashboardData(false);
+
+            // Tampilkan cache sesi langsung bila ada, lalu lakukan ping ringan
+            // untuk mengetahui apakah data di server berubah.
+            const cachedDashboard=getSessionJson(getDashboardCacheKey());
+            if(cachedDashboard && cachedDashboard.status==="success") {
+                cachedDashboard._cacheKey=getDashboardCacheKey();
+                if(cachedDashboard.version) setCachedDataVersion(cachedDashboard.version);
+                processDashboardResponse(cachedDashboard,false);
+                setLoader(false);
+                checkServerVersionAndRefreshIfNeeded();
+            } else {
+                loadDashboardData(false);
+            }
         } else {
             document.getElementById("login-section").classList.remove("hidden");
             setLoader(false);
         }
     };
-  </script>
+</script>
 </body>
 </html>
